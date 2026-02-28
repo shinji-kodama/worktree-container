@@ -39,8 +39,6 @@ linters:
       # Allow dot imports in test files for testify.
       - path: _test\.go
         text: "dot-imports"
-    max-issues-per-linter: 50
-    max-same-issues: 10
 
 formatters:
   enable:
