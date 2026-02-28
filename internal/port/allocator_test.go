@@ -1,6 +1,8 @@
 package port
 
 import (
+	"fmt"
+	"net"
 	"testing"
 
 	"github.com/shinji-kodama/worktree-container/internal/model"
@@ -200,4 +202,104 @@ func TestAllocatePort_UDP(t *testing.T) {
 
 	assert.Equal(t, 15000, alloc.HostPort, "UDP port should shift the same as TCP")
 	assert.Equal(t, "udp", alloc.Protocol)
+}
+
+// TestAllocatePorts_ThreeEnvironmentsUnique verifies that allocating ports
+// for 3 separate worktree environments produces completely unique host ports.
+// This is the core "port collision zero" test from the constitution.
+//
+// Scenario: 3 environments, each with app(3000), db(5432), redis(6379).
+// Expected:
+//   - Env 1 (index 1): 13000, 15432, 16379
+//   - Env 2 (index 2): 23000, 25432, 26379
+//   - Env 3 (index 3): 33000, 35432, 36379
+func TestAllocatePorts_ThreeEnvironmentsUnique(t *testing.T) {
+	scanner := NewScanner()
+	ports := []model.PortSpec{
+		{ServiceName: "app", ContainerPort: 3000, Protocol: "tcp"},
+		{ServiceName: "db", ContainerPort: 5432, Protocol: "tcp"},
+		{ServiceName: "redis", ContainerPort: 6379, Protocol: "tcp"},
+	}
+
+	// Track all allocated host ports across all environments.
+	allHostPorts := make(map[int]string) // hostPort → "env-service"
+
+	for envIndex := 1; envIndex <= 3; envIndex++ {
+		allocator := NewAllocator(scanner)
+
+		allocations, err := allocator.AllocatePorts(ports, envIndex)
+		require.NoError(t, err, "env %d allocation should succeed", envIndex)
+		require.Len(t, allocations, 3, "env %d should have 3 allocations", envIndex)
+
+		for _, alloc := range allocations {
+			key := alloc.HostPort
+			label := fmt.Sprintf("env%d-%s", envIndex, alloc.ServiceName)
+
+			// Verify no host port is used by another environment.
+			existing, conflict := allHostPorts[key]
+			assert.False(t, conflict,
+				"port %d is used by both %s and %s", key, existing, label)
+
+			allHostPorts[key] = label
+		}
+	}
+
+	// Verify we have exactly 9 unique host ports (3 envs × 3 services).
+	assert.Len(t, allHostPorts, 9, "should have 9 unique host ports across 3 environments")
+}
+
+// TestAllocatePorts_ExternalPortOccupied verifies that when an external process
+// occupies a port that would be the shifted target, the allocator finds
+// an alternative port without error.
+func TestAllocatePorts_ExternalPortOccupied(t *testing.T) {
+	scanner := NewScanner()
+
+	// Occupy a port that would be the shifted target for port 3000 at index 1.
+	// net.Listen on port 13000 simulates an external process.
+	listener, err := net.Listen("tcp", ":13000")
+	if err != nil {
+		// If 13000 is already in use by something else, the test still validates
+		// that the allocator avoids it.
+		t.Logf("Port 13000 already in use (by external process), test still valid")
+	} else {
+		defer listener.Close()
+	}
+
+	allocator := NewAllocator(scanner)
+	alloc, err := allocator.AllocatePort(3000, 1, "app", "tcp")
+	require.NoError(t, err)
+
+	// The allocator should have found an alternative since 13000 is occupied.
+	assert.NotEqual(t, 13000, alloc.HostPort,
+		"should avoid port 13000 which is occupied by external process")
+	assert.Equal(t, 3000, alloc.ContainerPort)
+	assert.Equal(t, "app", alloc.ServiceName)
+}
+
+// TestAllocatePorts_ExistingAndExternalConflict verifies the two-layer
+// conflict detection: both Docker label allocations AND OS-level port usage
+// are checked simultaneously.
+func TestAllocatePorts_ExistingAndExternalConflict(t *testing.T) {
+	scanner := NewScanner()
+	allocator := NewAllocator(scanner)
+
+	// Layer 1: Existing allocation from another worktree at 13000.
+	allocator.SetExistingAllocations([]model.PortAllocation{
+		{ServiceName: "other-app", ContainerPort: 3000, HostPort: 13000, Protocol: "tcp"},
+	})
+
+	// Layer 2: External process on 13001 (the likely fallback).
+	listener, err := net.Listen("tcp", ":13001")
+	if err != nil {
+		t.Logf("Port 13001 already in use, test still valid")
+	} else {
+		defer listener.Close()
+	}
+
+	alloc, err := allocator.AllocatePort(3000, 1, "app", "tcp")
+	require.NoError(t, err)
+
+	// Must avoid both 13000 (existing allocation) and 13001 (external process).
+	assert.NotEqual(t, 13000, alloc.HostPort, "should avoid existing allocation")
+	assert.NotEqual(t, 13001, alloc.HostPort, "should avoid externally occupied port")
 }
