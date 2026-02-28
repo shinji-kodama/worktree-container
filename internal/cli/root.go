@@ -77,6 +77,10 @@ zero port collisions between environments.`,
 	rootCmd.PersistentFlags().BoolVar(&jsonOutput, "json", false, "Output in JSON format")
 	rootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "Enable verbose output")
 
+	// Register subcommands. Each subcommand is defined in its own file
+	// (create.go, list.go, etc.) and returns a *cobra.Command.
+	rootCmd.AddCommand(NewCreateCommand())
+
 	return rootCmd
 }
 
