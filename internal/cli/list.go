@@ -85,7 +85,7 @@ func runList(ctx context.Context, flags *listFlags) error {
 	}
 	// defer ensures the Docker client is closed when this function returns,
 	// releasing the underlying HTTP connection and resources.
-	defer cli.Close()
+	defer func() { _ = cli.Close() }()
 
 	VerboseLog("Connected to Docker daemon")
 

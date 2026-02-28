@@ -338,7 +338,7 @@ func determineWorktreeIndex(ctx context.Context) (int, error) {
 	if err != nil {
 		return 1, err
 	}
-	defer cli.Close()
+	defer func() { _ = cli.Close() }()
 
 	containers, err := docker.ListManagedContainers(ctx, cli)
 	if err != nil {
@@ -364,7 +364,7 @@ func loadExistingAllocations(ctx context.Context) ([]model.PortAllocation, error
 	if err != nil {
 		return nil, err
 	}
-	defer cli.Close()
+	defer func() { _ = cli.Close() }()
 
 	containers, err := docker.ListManagedContainers(ctx, cli)
 	if err != nil {
@@ -388,9 +388,7 @@ func startContainers(ctx context.Context, pattern model.ConfigPattern, devcontai
 		// Pattern C/D: Use docker compose with the override file.
 		// Build the full list of compose files: originals + override.
 		allComposeFiles := make([]string, 0, len(composeFiles)+1)
-		for _, cf := range composeFiles {
-			allComposeFiles = append(allComposeFiles, cf)
-		}
+		allComposeFiles = append(allComposeFiles, composeFiles...)
 		allComposeFiles = append(allComposeFiles, "docker-compose.worktree.yml")
 
 		envVars := map[string]string{

@@ -317,8 +317,8 @@ func parsePorcelainOutput(output string) []WorktreeInfo {
 			if current != nil {
 				current.IsBare = true
 			}
-		// "detached" is another possible marker — we don't need to track it
-		// explicitly because a detached HEAD simply has an empty Branch field.
+			// "detached" is another possible marker — we don't need to track it
+			// explicitly because a detached HEAD simply has an empty Branch field.
 		}
 	}
 

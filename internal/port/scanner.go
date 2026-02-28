@@ -62,7 +62,7 @@ func (s *Scanner) IsPortAvailable(port int, protocol string) bool {
 		// defer ensures the listener is closed even if something panics between
 		// here and the return statement. We close immediately because we only
 		// needed to test availability, not actually accept connections.
-		defer listener.Close()
+		defer func() { _ = listener.Close() }()
 		return true
 
 	case "udp":
@@ -72,7 +72,7 @@ func (s *Scanner) IsPortAvailable(port int, protocol string) bool {
 		if err != nil {
 			return false
 		}
-		defer conn.Close()
+		defer func() { _ = conn.Close() }()
 		return true
 
 	default:

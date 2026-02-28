@@ -243,9 +243,9 @@ func TestDetectPattern_ComposeMulti(t *testing.T) {
 func TestExtractPorts_ForwardPorts(t *testing.T) {
 	raw := &RawDevContainer{
 		ForwardPorts: []interface{}{
-			float64(3000),  // plain integer port
-			"db:5432",      // service:port string
-			"redis:6379",   // another service:port string
+			float64(3000), // plain integer port
+			"db:5432",     // service:port string
+			"redis:6379",  // another service:port string
 		},
 	}
 

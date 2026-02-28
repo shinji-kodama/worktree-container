@@ -262,7 +262,7 @@ func TestAllocatePorts_ExternalPortOccupied(t *testing.T) {
 		// that the allocator avoids it.
 		t.Logf("Port 13000 already in use (by external process), test still valid")
 	} else {
-		defer listener.Close()
+		defer func() { _ = listener.Close() }()
 	}
 
 	allocator := NewAllocator(scanner)
@@ -293,7 +293,7 @@ func TestAllocatePorts_ExistingAndExternalConflict(t *testing.T) {
 	if err != nil {
 		t.Logf("Port 13001 already in use, test still valid")
 	} else {
-		defer listener.Close()
+		defer func() { _ = listener.Close() }()
 	}
 
 	alloc, err := allocator.AllocatePort(3000, 1, "app", "tcp")

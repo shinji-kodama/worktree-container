@@ -1,8 +1,8 @@
 // Package cli — remove.go implements the "worktree-container remove" command.
 //
 // The remove command completely destroys a worktree environment by:
-//   1. Stopping and removing all Docker containers and resources
-//   2. Optionally removing the Git worktree directory
+//  1. Stopping and removing all Docker containers and resources
+//  2. Optionally removing the Git worktree directory
 //
 // For Compose-based patterns (C/D), it uses `docker compose down -v` which
 // removes containers, networks, and volumes. For non-Compose patterns (A/B),
@@ -83,7 +83,7 @@ func runRemove(ctx context.Context, envName string, flags *removeFlags) error {
 	if err != nil {
 		return err
 	}
-	defer cli.Close()
+	defer func() { _ = cli.Close() }()
 
 	VerboseLog("Connected to Docker daemon")
 
@@ -198,11 +198,11 @@ func printRemoveResult(envName string, containerCount int, worktreePath string, 
 // printRemoveResultJSON outputs the remove result as structured JSON.
 func printRemoveResultJSON(envName string, containerCount int, worktreePath string, worktreeRemoved bool) {
 	result := map[string]interface{}{
-		"name":             envName,
-		"action":           "removed",
-		"containerCount":   containerCount,
-		"worktreeRemoved":  worktreeRemoved,
-		"worktreePath":     worktreePath,
+		"name":            envName,
+		"action":          "removed",
+		"containerCount":  containerCount,
+		"worktreeRemoved": worktreeRemoved,
+		"worktreePath":    worktreePath,
 	}
 
 	data, _ := json.MarshalIndent(result, "", "  ")

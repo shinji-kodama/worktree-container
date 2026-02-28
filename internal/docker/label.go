@@ -78,11 +78,11 @@ const ManagedByValue = "worktree-container"
 // inspecting containers with `docker inspect`.
 func BuildLabels(env *model.WorktreeEnv) map[string]string {
 	labels := map[string]string{
-		LabelManagedBy:    ManagedByValue,
-		LabelName:         env.Name,
-		LabelBranch:       env.Branch,
-		LabelWorktreePath: env.WorktreePath,
-		LabelSourceRepo:   env.SourceRepoPath,
+		LabelManagedBy:     ManagedByValue,
+		LabelName:          env.Name,
+		LabelBranch:        env.Branch,
+		LabelWorktreePath:  env.WorktreePath,
+		LabelSourceRepo:    env.SourceRepoPath,
 		LabelConfigPattern: env.ConfigPattern.String(),
 		// time.RFC3339 produces ISO-8601 compatible timestamps like
 		// "2026-02-28T10:00:00Z". Using UTC ensures consistency

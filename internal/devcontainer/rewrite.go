@@ -2,9 +2,9 @@
 // for Pattern A (image) and Pattern B (dockerfile) configurations.
 //
 // The original devcontainer.json is NEVER modified (FR-012). Instead, this module:
-//   1. Parses the comment-stripped JSON into a generic map[string]interface{}
-//   2. Applies worktree-specific modifications (name, labels, port shifts, env vars)
-//   3. Serializes back to JSON and writes to the worktree's .devcontainer/ directory
+//  1. Parses the comment-stripped JSON into a generic map[string]interface{}
+//  2. Applies worktree-specific modifications (name, labels, port shifts, env vars)
+//  3. Serializes back to JSON and writes to the worktree's .devcontainer/ directory
 //
 // Using a map-based approach (instead of the typed RawDevContainer struct) ensures
 // that unknown fields from the original devcontainer.json are preserved in the
@@ -31,10 +31,10 @@ import (
 // modified JSON as formatted bytes.
 //
 // The function works in three phases:
-//   1. Strip JSONC comments and parse into a generic map
-//   2. Apply modifications: name, runArgs labels, appPort shifts,
-//      portsAttributes key updates, and containerEnv additions
-//   3. Re-serialize with indentation for human readability
+//  1. Strip JSONC comments and parse into a generic map
+//  2. Apply modifications: name, runArgs labels, appPort shifts,
+//     portsAttributes key updates, and containerEnv additions
+//  3. Re-serialize with indentation for human readability
 //
 // Parameters:
 //   - rawJSON: the original devcontainer.json file contents (may include JSONC comments)
@@ -105,7 +105,8 @@ func RewriteConfig(rawJSON []byte, envName string, worktreeIndex int, portAlloca
 // Each label is added as two separate entries: "--label" and "key=value".
 //
 // Example: for label {"worktree.name": "my-env"}, this appends:
-//   "--label", "worktree.name=my-env"
+//
+//	"--label", "worktree.name=my-env"
 //
 // If runArgs doesn't exist yet in the config, it is created as a new array.
 func applyRunArgsLabels(configMap map[string]interface{}, labels map[string]string) {
@@ -340,14 +341,14 @@ func copyFile(src, dst string, mode os.FileMode) error {
 	}
 	// defer ensures the file is closed even if an error occurs below.
 	// This is a common Go pattern for resource cleanup.
-	defer srcFile.Close()
+	defer func() { _ = srcFile.Close() }()
 
 	// Create the destination file with the same permissions as the source.
 	dstFile, err := os.OpenFile(dst, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, mode)
 	if err != nil {
 		return fmt.Errorf("failed to create destination file %s: %w", dst, err)
 	}
-	defer dstFile.Close()
+	defer func() { _ = dstFile.Close() }()
 
 	// Stream the file contents. io.Copy reads from src and writes to dst
 	// in chunks, avoiding loading the entire file into memory.

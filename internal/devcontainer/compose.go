@@ -160,8 +160,8 @@ func WriteComposeOverride(outputPath string, data []byte) error {
 
 // RewriteComposeConfig takes the raw bytes of a devcontainer.json file (with
 // JSONC comments) and rewrites it for Compose patterns by:
-//   1. Updating the `name` field to the worktree environment name
-//   2. Appending the override YAML path to the `dockerComposeFile` array
+//  1. Updating the `name` field to the worktree environment name
+//  2. Appending the override YAML path to the `dockerComposeFile` array
 //
 // This function is used for Pattern C and D configurations. Unlike RewriteConfig
 // (for Pattern A/B), it does NOT modify runArgs, appPort, or portsAttributes,

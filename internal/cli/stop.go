@@ -57,7 +57,7 @@ func runStop(ctx context.Context, envName string) error {
 	if err != nil {
 		return err // NewClient already returns CLIError with ExitDockerNotRunning
 	}
-	defer cli.Close()
+	defer func() { _ = cli.Close() }()
 
 	VerboseLog("Connected to Docker daemon")
 
