@@ -1,0 +1,9 @@
+services:
+  app:
+    image: node:20-slim
+    working_dir: /workspace
+    volumes:
+      - ..:/workspace:cached
+    ports:
+      - "3000:3000"
+    command: sleep infinity

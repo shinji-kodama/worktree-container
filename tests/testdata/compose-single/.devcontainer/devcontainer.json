@@ -1,0 +1,10 @@
+// Pattern C: Compose single service
+// Uses Docker Compose with a single service definition.
+{
+  "name": "compose-single-app",
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "app",
+  "workspaceFolder": "/workspace",
+  "forwardPorts": [3000],
+  "shutdownAction": "stopCompose"
+}
