@@ -107,14 +107,6 @@ func ValidateGeneratedConfig(jsonData []byte) []ValidationError {
 
 	errors := ValidateConfig(&raw)
 
-	// Additional check: verify name is set (required for worktree identification).
-	if raw.Name == "" {
-		errors = append(errors, ValidationError{
-			Field:   "name",
-			Message: "generated config must have a name for environment identification",
-		})
-	}
-
 	return errors
 }
 
@@ -286,11 +278,6 @@ func SanitizeForDevPod(configMap map[string]interface{}) bool {
 			changed = true
 		}
 	}
-
-	// Remove remoteUser if it conflicts with DevPod's user management.
-	// DevPod handles user mapping differently from VS Code.
-	// Note: We don't remove it, just ensure it doesn't cause issues.
-	_ = changed // Suppress unused variable if no changes are needed.
 
 	return changed
 }

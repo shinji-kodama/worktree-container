@@ -18,6 +18,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"sort"
 	"strconv"
 	"strings"
 
@@ -117,10 +118,16 @@ func applyRunArgsLabels(configMap map[string]interface{}, labels map[string]stri
 	}
 
 	// Append --label flags for each label entry.
-	// We sort-order is not guaranteed for maps, but that's acceptable since
-	// Docker labels are key-value pairs and order doesn't matter.
-	for key, value := range labels {
-		runArgs = append(runArgs, "--label", fmt.Sprintf("%s=%s", key, value))
+	// Map iteration order is non-deterministic in Go, so we sort the keys
+	// to produce stable, reproducible output across runs.
+	keys := make([]string, 0, len(labels))
+	for key := range labels {
+		keys = append(keys, key)
+	}
+	sort.Strings(keys)
+
+	for _, key := range keys {
+		runArgs = append(runArgs, "--label", fmt.Sprintf("%s=%s", key, labels[key]))
 	}
 
 	configMap["runArgs"] = runArgs

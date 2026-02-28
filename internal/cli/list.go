@@ -14,6 +14,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"sort"
+	"strconv"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -248,13 +249,20 @@ func FormatPortsList(allocations []model.PortAllocation) string {
 		return "-"
 	}
 
-	// Collect all host ports into a string slice for joining.
-	ports := make([]string, 0, len(allocations))
+	// Collect all host ports as integers for proper numeric sorting.
+	portNums := make([]int, 0, len(allocations))
 	for _, pa := range allocations {
-		ports = append(ports, fmt.Sprintf("%d", pa.HostPort))
+		portNums = append(portNums, pa.HostPort)
 	}
 
-	// Sort port strings numerically for consistent, predictable output.
-	sort.Strings(ports)
+	// Sort numerically to ensure correct ordering (e.g., 3000 before 15432).
+	// Lexicographic sort would incorrectly order "15432" before "3000".
+	sort.Ints(portNums)
+
+	// Convert sorted integers back to strings for joining.
+	ports := make([]string, 0, len(portNums))
+	for _, p := range portNums {
+		ports = append(ports, strconv.Itoa(p))
+	}
 	return strings.Join(ports, ",")
 }

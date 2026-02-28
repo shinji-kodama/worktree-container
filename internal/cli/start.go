@@ -99,7 +99,7 @@ func runStart(ctx context.Context, envName string) error {
 			"COMPOSE_PROJECT_NAME": envName,
 		}
 		if err := docker.ComposeUp(ctx, devcontainerDir, nil, envVars); err != nil {
-			return model.WrapCLIError(model.ExitDockerNotRunning,
+			return model.WrapCLIError(model.ExitGeneralError,
 				fmt.Sprintf("failed to start environment %q", envName), err)
 		}
 	} else {
@@ -108,7 +108,7 @@ func runStart(ctx context.Context, envName string) error {
 		for _, c := range containers {
 			VerboseLog("Starting container %s (%s)...", c.ContainerName, c.ContainerID[:12])
 			if err := docker.StartContainer(ctx, cli, c.ContainerID); err != nil {
-				return model.WrapCLIError(model.ExitDockerNotRunning,
+				return model.WrapCLIError(model.ExitGeneralError,
 					fmt.Sprintf("failed to start container %q", c.ContainerName), err)
 			}
 		}
