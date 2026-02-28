@@ -353,6 +353,27 @@ func RunContainer(ctx context.Context, cli *Client, imageName string, containerN
 	return nil
 }
 
+// StartContainer starts a stopped container by its ID using the Docker SDK.
+// It sends a start request to the Docker daemon, which resumes the container's
+// main process. If the container is already running, Docker returns an error.
+//
+// This is used for Pattern A/B containers that are managed individually
+// rather than through docker compose. The "start" command uses this to
+// restart previously stopped environments.
+func StartContainer(ctx context.Context, cli *Client, containerID string) error {
+	// container.StartOptions is currently empty in the Docker SDK but is
+	// included for forward compatibility with future Docker API versions.
+	err := cli.Inner().ContainerStart(ctx, containerID, container.StartOptions{})
+	if err != nil {
+		return model.WrapCLIError(
+			model.ExitDockerNotRunning,
+			fmt.Sprintf("failed to start container %q", containerID),
+			err,
+		)
+	}
+	return nil
+}
+
 // StopContainer stops a running container by its ID using the Docker SDK.
 // It sends a SIGTERM signal to the container's main process and waits
 // for it to exit gracefully. If the container does not stop within the

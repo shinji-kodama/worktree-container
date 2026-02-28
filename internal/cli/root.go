@@ -80,6 +80,10 @@ zero port collisions between environments.`,
 	// Register subcommands. Each subcommand is defined in its own file
 	// (create.go, list.go, etc.) and returns a *cobra.Command.
 	rootCmd.AddCommand(NewCreateCommand())
+	rootCmd.AddCommand(NewListCommand())
+	rootCmd.AddCommand(NewStopCommand())
+	rootCmd.AddCommand(NewStartCommand())
+	rootCmd.AddCommand(NewRemoveCommand())
 
 	return rootCmd
 }
