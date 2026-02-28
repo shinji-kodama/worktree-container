@@ -1,0 +1,11 @@
+// Pattern D: Compose multi-service
+// Uses Docker Compose with multiple services (app, db, redis).
+{
+  "name": "compose-multi-app",
+  "dockerComposeFile": ["docker-compose.yml"],
+  "service": "app",
+  "runServices": ["app", "db", "redis"],
+  "workspaceFolder": "/workspace",
+  "forwardPorts": [3000, "db:5432", "redis:6379"],
+  "shutdownAction": "stopCompose"
+}

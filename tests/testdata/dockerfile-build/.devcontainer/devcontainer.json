@@ -1,0 +1,27 @@
+// Pattern B: Dockerfile build
+// Builds a container image from a Dockerfile with custom context.
+{
+  "name": "custom-build-app",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "context": "..",
+    "args": {
+      "NODE_VERSION": "20"
+    }
+  },
+  "forwardPorts": [3000, 5432],
+  "appPort": ["3000:3000"],
+  "portsAttributes": {
+    "3000": {
+      "label": "Web App",
+      "onAutoForward": "notify"
+    },
+    "5432": {
+      "label": "PostgreSQL",
+      "onAutoForward": "silent"
+    }
+  },
+  "containerEnv": {
+    "DATABASE_URL": "postgresql://localhost:5432/devdb"
+  }
+}
