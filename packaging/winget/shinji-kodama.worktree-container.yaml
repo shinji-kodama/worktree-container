@@ -1,0 +1,14 @@
+# yaml-language-server: $schema=https://aka.ms/winget-manifest.version.1.9.0.schema.json
+# ─────────────────────────────────────────────────────────────────────
+# WinGet Version Manifest for worktree-container
+#
+# Directory in winget-pkgs:
+#   manifests/s/shinji-kodama/worktree-container/{{VERSION}}/
+#
+# File name: shinji-kodama.worktree-container.yaml
+# ─────────────────────────────────────────────────────────────────────
+PackageIdentifier: shinji-kodama.worktree-container
+PackageVersion: "{{VERSION}}"
+DefaultLocale: en-US
+ManifestType: version
+ManifestVersion: 1.9.0
