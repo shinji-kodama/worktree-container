@@ -329,7 +329,7 @@ func runCompose(ctx context.Context, projectDir string, args []string, envVars m
 // because the Docker SDK's ContainerCreate + ContainerStart workflow
 // requires constructing complex Config/HostConfig structs, while
 // "docker run" accepts the same CLI flags users are familiar with.
-func RunContainer(ctx context.Context, cli *Client, imageName string, containerName string, runArgs []string) error {
+func RunContainer(ctx context.Context, cli *Client, imageName, containerName string, runArgs []string) error {
 	// Build the full argument list for "docker run -d".
 	// The -d flag runs the container in detached mode (background).
 	args := make([]string, 0, len(runArgs)+4)

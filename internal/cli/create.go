@@ -107,8 +107,8 @@ func runCreate(ctx context.Context, branchName string, flags *createFlags) error
 	if envName == "" {
 		envName = sanitizeBranchName(branchName)
 	}
-	if err := model.ValidateName(envName); err != nil {
-		return model.WrapCLIError(model.ExitGeneralError, "invalid environment name", err)
+	if validateErr := model.ValidateName(envName); validateErr != nil {
+		return model.WrapCLIError(model.ExitGeneralError, "invalid environment name", validateErr)
 	}
 	VerboseLog("Environment name: %s", envName)
 
@@ -128,8 +128,8 @@ func runCreate(ctx context.Context, branchName string, flags *createFlags) error
 
 	// Step 4: Create Git worktree.
 	VerboseLog("Creating Git worktree for branch %q...", branchName)
-	if err := wm.Add(repoRoot, branchName, worktreePath, flags.base); err != nil {
-		return model.WrapCLIError(model.ExitGitError, "failed to create worktree", err)
+	if addErr := wm.Add(repoRoot, branchName, worktreePath, flags.base); addErr != nil {
+		return model.WrapCLIError(model.ExitGitError, "failed to create worktree", addErr)
 	}
 	VerboseLog("Git worktree created successfully")
 
@@ -240,8 +240,8 @@ func runCreate(ctx context.Context, branchName string, flags *createFlags) error
 		}
 
 		overridePath := filepath.Join(dstDevcontainerDir, "docker-compose.worktree.yml")
-		if err := devcontainer.WriteComposeOverride(overridePath, overrideData); err != nil {
-			return model.WrapCLIError(model.ExitGeneralError, "failed to write Compose override", err)
+		if writeErr := devcontainer.WriteComposeOverride(overridePath, overrideData); writeErr != nil {
+			return model.WrapCLIError(model.ExitGeneralError, "failed to write Compose override", writeErr)
 		}
 		VerboseLog("Compose override written to: %s", overridePath)
 

@@ -178,7 +178,7 @@ func WriteComposeOverride(outputPath string, data []byte) error {
 //     (relative to the devcontainer.json location, e.g., "docker-compose.worktree.yml")
 //
 // Returns the modified JSON bytes, or an error if parsing/serialization fails.
-func RewriteComposeConfig(rawJSON []byte, envName string, overrideYAMLPath string) ([]byte, error) {
+func RewriteComposeConfig(rawJSON []byte, envName, overrideYAMLPath string) ([]byte, error) {
 	// Strip JSONC comments and parse into a generic map.
 	// Same approach as RewriteConfig — we use a map to preserve unknown fields.
 	cleanJSON := jsonc.ToJSON(rawJSON)

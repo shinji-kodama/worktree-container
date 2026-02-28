@@ -90,7 +90,7 @@ func (a *Allocator) SetExistingAllocations(allocs []model.PortAllocation) {
 //   - protocol: "tcp" or "udp"
 //
 // Returns the allocated PortAllocation or an error if no port could be assigned.
-func (a *Allocator) AllocatePort(originalPort int, worktreeIndex int, serviceName string, protocol string) (*model.PortAllocation, error) {
+func (a *Allocator) AllocatePort(originalPort, worktreeIndex int, serviceName, protocol string) (*model.PortAllocation, error) {
 	// Validate the worktree index against the design limit.
 	if worktreeIndex < 0 || worktreeIndex > maxWorktreeIndex {
 		return nil, fmt.Errorf("worktree index %d out of range (0-%d)", worktreeIndex, maxWorktreeIndex)

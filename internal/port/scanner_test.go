@@ -40,7 +40,9 @@ func TestIsPortAvailable_UsedPort(t *testing.T) {
 
 	// Extract the actual port the OS assigned to our listener.
 	// listener.Addr() returns a net.Addr; for TCP it's a *net.TCPAddr.
-	port := listener.Addr().(*net.TCPAddr).Port
+	tcpAddr, ok := listener.Addr().(*net.TCPAddr)
+	require.True(t, ok)
+	port := tcpAddr.Port
 
 	scanner := NewScanner()
 	available := scanner.IsPortAvailable(port, "tcp")
@@ -55,7 +57,9 @@ func TestIsPortAvailable_UDP(t *testing.T) {
 	require.NoError(t, err, "failed to start test UDP listener")
 	defer func() { _ = conn.Close() }()
 
-	port := conn.LocalAddr().(*net.UDPAddr).Port
+	udpAddr, ok := conn.LocalAddr().(*net.UDPAddr)
+	require.True(t, ok)
+	port := udpAddr.Port
 
 	scanner := NewScanner()
 	available := scanner.IsPortAvailable(port, "udp")
@@ -141,7 +145,9 @@ func TestGetUsedPorts(t *testing.T) {
 	require.NoError(t, err)
 	defer func() { _ = listener.Close() }()
 
-	port := listener.Addr().(*net.TCPAddr).Port
+	tcpAddr, ok := listener.Addr().(*net.TCPAddr)
+	require.True(t, ok)
+	port := tcpAddr.Port
 
 	// Scan a range that includes our occupied port.
 	used := scanner.GetUsedPorts(port, port)

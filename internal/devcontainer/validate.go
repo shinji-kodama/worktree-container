@@ -120,7 +120,7 @@ func ValidateGeneratedConfig(jsonData []byte) []ValidationError {
 //   - devcontainerPath: relative path to devcontainer.json within the workspace
 //
 // Returns the DevPod CLI command and arguments.
-func GenerateDevPodConfig(workspaceFolder string, devcontainerPath string) DevPodInfo {
+func GenerateDevPodConfig(workspaceFolder, devcontainerPath string) DevPodInfo {
 	info := DevPodInfo{
 		WorkspaceFolder:  workspaceFolder,
 		DevContainerPath: devcontainerPath,

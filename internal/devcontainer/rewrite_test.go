@@ -372,8 +372,8 @@ func TestCopyDevContainerDir(t *testing.T) {
 	// Assert: all non-devcontainer.json files are copied with correct content.
 	for path, expectedContent := range files {
 		dstPath := filepath.Join(dstSubDir, path)
-		readBack, err := os.ReadFile(dstPath)
-		require.NoError(t, err, "file %s should exist in destination", path)
+		readBack, readErr := os.ReadFile(dstPath)
+		require.NoError(t, readErr, "file %s should exist in destination", path)
 		assert.Equal(t, expectedContent, string(readBack),
 			"content of %s should match the source", path)
 	}

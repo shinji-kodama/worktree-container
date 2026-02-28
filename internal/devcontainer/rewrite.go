@@ -252,13 +252,13 @@ func WriteRewrittenConfig(outputPath string, data []byte) error {
 	// os.MkdirAll is a no-op if the directory already exists, and creates
 	// all necessary parent directories (like `mkdir -p`).
 	dir := filepath.Dir(outputPath)
-	if err := os.MkdirAll(dir, 0755); err != nil {
+	if err := os.MkdirAll(dir, 0o755); err != nil {
 		return fmt.Errorf("failed to create directory %s: %w", dir, err)
 	}
 
 	// Write the file contents atomically (from the caller's perspective).
 	// os.WriteFile handles open-write-close in a single call.
-	if err := os.WriteFile(outputPath, data, 0644); err != nil {
+	if err := os.WriteFile(outputPath, data, 0o644); err != nil {
 		return fmt.Errorf("failed to write rewritten devcontainer.json to %s: %w", outputPath, err)
 	}
 
