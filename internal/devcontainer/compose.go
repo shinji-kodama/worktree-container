@@ -22,7 +22,7 @@ import (
 	"fmt"
 	"sort"
 
-	"github.com/shinji-kodama/worktree-container/internal/model"
+	"github.com/mmr-tortoise/worktree-container/internal/model"
 	"github.com/tidwall/jsonc"
 	"gopkg.in/yaml.v3"
 )
@@ -160,8 +160,8 @@ func WriteComposeOverride(outputPath string, data []byte) error {
 
 // RewriteComposeConfig takes the raw bytes of a devcontainer.json file (with
 // JSONC comments) and rewrites it for Compose patterns by:
-//   1. Updating the `name` field to the worktree environment name
-//   2. Appending the override YAML path to the `dockerComposeFile` array
+//  1. Updating the `name` field to the worktree environment name
+//  2. Appending the override YAML path to the `dockerComposeFile` array
 //
 // This function is used for Pattern C and D configurations. Unlike RewriteConfig
 // (for Pattern A/B), it does NOT modify runArgs, appPort, or portsAttributes,
@@ -178,7 +178,7 @@ func WriteComposeOverride(outputPath string, data []byte) error {
 //     (relative to the devcontainer.json location, e.g., "docker-compose.worktree.yml")
 //
 // Returns the modified JSON bytes, or an error if parsing/serialization fails.
-func RewriteComposeConfig(rawJSON []byte, envName string, overrideYAMLPath string) ([]byte, error) {
+func RewriteComposeConfig(rawJSON []byte, envName, overrideYAMLPath string) ([]byte, error) {
 	// Strip JSONC comments and parse into a generic map.
 	// Same approach as RewriteConfig — we use a map to preserve unknown fields.
 	cleanJSON := jsonc.ToJSON(rawJSON)

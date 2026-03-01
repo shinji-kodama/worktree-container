@@ -19,9 +19,9 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/shinji-kodama/worktree-container/internal/docker"
-	"github.com/shinji-kodama/worktree-container/internal/model"
-	"github.com/shinji-kodama/worktree-container/internal/port"
+	"github.com/mmr-tortoise/worktree-container/internal/docker"
+	"github.com/mmr-tortoise/worktree-container/internal/model"
+	"github.com/mmr-tortoise/worktree-container/internal/port"
 )
 
 // NewStartCommand creates the "start" cobra command.
@@ -60,7 +60,7 @@ func runStart(ctx context.Context, envName string) error {
 	if err != nil {
 		return err
 	}
-	defer cli.Close()
+	defer func() { _ = cli.Close() }()
 
 	VerboseLog("Connected to Docker daemon")
 

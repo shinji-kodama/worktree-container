@@ -12,7 +12,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/shinji-kodama/worktree-container/internal/model"
+	"github.com/mmr-tortoise/worktree-container/internal/model"
 )
 
 // Global flag variables shared across all subcommands.
@@ -121,7 +121,9 @@ func printError(message string, underlying error) {
 			},
 		}
 		if underlying != nil {
-			errObj["error"].(map[string]interface{})["detail"] = underlying.Error()
+			if errMap, ok := errObj["error"].(map[string]interface{}); ok {
+				errMap["detail"] = underlying.Error()
+			}
 		}
 		// json.MarshalIndent produces human-readable JSON with indentation.
 		// We write to stderr for errors, even in JSON mode, because stdout

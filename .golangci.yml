@@ -1,5 +1,7 @@
 # golangci-lint configuration for worktree-container
-# Documentation: https://golangci-lint.run/usage/configuration/
+# Documentation: https://golangci-lint.run/docs/configuration/
+version: "2"
+
 run:
   timeout: 5m
   modules-download-mode: readonly
@@ -10,43 +12,34 @@ linters:
     - govet          # Reports suspicious constructs
     - staticcheck    # Advanced static analysis
     - unused         # Find unused code
-    - gosimple       # Simplify code
     - ineffassign    # Detect ineffectual assignments
-    - typecheck      # Type checking
     - gocritic       # Opinionated code reviewer
-    - gofmt          # Check formatting
     - misspell       # Find misspelled words in comments
-    - exportloopref  # Detect loop variable capture in closures
+  settings:
+    govet:
+      enable-all: true
+      disable:
+        - fieldalignment  # Not useful for this project
+    gocritic:
+      enabled-tags:
+        - diagnostic
+        - style
+      disabled-checks:
+        - ifElseChain     # Allow if-else chains for readability
+    errcheck:
+      check-type-assertions: true
+      check-blank: false
+  exclusions:
+    rules:
+      # Allow unused params in test files (common in table-driven tests).
+      - path: _test\.go
+        linters:
+          - unused
+          - gocritic
+      # Allow dot imports in test files for testify.
+      - path: _test\.go
+        text: "dot-imports"
 
-linters-settings:
-  govet:
-    enable-all: true
-    disable:
-      - fieldalignment  # Not useful for this project
-
-  gocritic:
-    enabled-tags:
-      - diagnostic
-      - style
-    disabled-checks:
-      - ifElseChain     # Allow if-else chains for readability
-      - hugeParam       # Allow large params in some cases
-
-  errcheck:
-    check-type-assertions: true
-    check-blank: false
-
-issues:
-  exclude-rules:
-    # Allow unused params in test files (common in table-driven tests).
-    - path: _test\.go
-      linters:
-        - unused
-        - gocritic
-
-    # Allow dot imports in test files for testify.
-    - path: _test\.go
-      text: "dot-imports"
-
-  max-issues-per-linter: 50
-  max-same-issues: 10
+formatters:
+  enable:
+    - gofmt          # Check formatting

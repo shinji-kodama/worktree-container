@@ -19,8 +19,8 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/shinji-kodama/worktree-container/internal/docker"
-	"github.com/shinji-kodama/worktree-container/internal/model"
+	"github.com/mmr-tortoise/worktree-container/internal/docker"
+	"github.com/mmr-tortoise/worktree-container/internal/model"
 )
 
 // listFlags holds the flag values for the list command.
@@ -85,7 +85,7 @@ func runList(ctx context.Context, flags *listFlags) error {
 	}
 	// defer ensures the Docker client is closed when this function returns,
 	// releasing the underlying HTTP connection and resources.
-	defer cli.Close()
+	defer func() { _ = cli.Close() }()
 
 	VerboseLog("Connected to Docker daemon")
 

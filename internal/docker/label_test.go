@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/shinji-kodama/worktree-container/internal/model"
+	"github.com/mmr-tortoise/worktree-container/internal/model"
 )
 
 // TestBuildLabels verifies that BuildLabels correctly converts a WorktreeEnv
@@ -76,13 +76,13 @@ func TestBuildLabels_NoPorts(t *testing.T) {
 func TestParseLabels(t *testing.T) {
 	// Arrange: create a label map matching what BuildLabels would produce.
 	labels := map[string]string{
-		LabelManagedBy:    ManagedByValue,
-		LabelName:         "feature-auth",
-		LabelBranch:       "feature/auth",
-		LabelWorktreePath: "/Users/user/repo-feature-auth",
-		LabelSourceRepo:   "/Users/user/repo",
-		LabelConfigPattern: "compose-multi",
-		LabelCreatedAt:    "2026-02-28T10:00:00Z",
+		LabelManagedBy:                ManagedByValue,
+		LabelName:                     "feature-auth",
+		LabelBranch:                   "feature/auth",
+		LabelWorktreePath:             "/Users/user/repo-feature-auth",
+		LabelSourceRepo:               "/Users/user/repo",
+		LabelConfigPattern:            "compose-multi",
+		LabelCreatedAt:                "2026-02-28T10:00:00Z",
 		"worktree.original-port.3000": "13000",
 		"worktree.original-port.5432": "15432",
 	}
@@ -116,13 +116,13 @@ func TestParseLabels(t *testing.T) {
 // are no port labels — the PortAllocations slice should be empty.
 func TestParseLabels_NoPorts(t *testing.T) {
 	labels := map[string]string{
-		LabelManagedBy:    ManagedByValue,
-		LabelName:         "simple",
-		LabelBranch:       "main",
-		LabelWorktreePath: "/tmp/worktree",
-		LabelSourceRepo:   "/tmp/repo",
+		LabelManagedBy:     ManagedByValue,
+		LabelName:          "simple",
+		LabelBranch:        "main",
+		LabelWorktreePath:  "/tmp/worktree",
+		LabelSourceRepo:    "/tmp/repo",
 		LabelConfigPattern: "image",
-		LabelCreatedAt:    "2026-01-01T00:00:00Z",
+		LabelCreatedAt:     "2026-01-01T00:00:00Z",
 	}
 
 	env, err := ParseLabels(labels)
@@ -154,13 +154,13 @@ func TestParseLabels_MissingRequired(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			// Start with a complete valid label set.
 			labels := map[string]string{
-				LabelManagedBy:    ManagedByValue,
-				LabelName:         "test",
-				LabelBranch:       "main",
-				LabelWorktreePath: "/tmp/wt",
-				LabelSourceRepo:   "/tmp/repo",
+				LabelManagedBy:     ManagedByValue,
+				LabelName:          "test",
+				LabelBranch:        "main",
+				LabelWorktreePath:  "/tmp/wt",
+				LabelSourceRepo:    "/tmp/repo",
 				LabelConfigPattern: "image",
-				LabelCreatedAt:    "2026-01-01T00:00:00Z",
+				LabelCreatedAt:     "2026-01-01T00:00:00Z",
 			}
 
 			// Remove the label under test.
@@ -178,13 +178,13 @@ func TestParseLabels_MissingRequired(t *testing.T) {
 // containers with an unexpected managed-by value.
 func TestParseLabels_InvalidManagedBy(t *testing.T) {
 	labels := map[string]string{
-		LabelManagedBy:    "some-other-tool",
-		LabelName:         "test",
-		LabelBranch:       "main",
-		LabelWorktreePath: "/tmp/wt",
-		LabelSourceRepo:   "/tmp/repo",
+		LabelManagedBy:     "some-other-tool",
+		LabelName:          "test",
+		LabelBranch:        "main",
+		LabelWorktreePath:  "/tmp/wt",
+		LabelSourceRepo:    "/tmp/repo",
 		LabelConfigPattern: "image",
-		LabelCreatedAt:    "2026-01-01T00:00:00Z",
+		LabelCreatedAt:     "2026-01-01T00:00:00Z",
 	}
 
 	_, err := ParseLabels(labels)
@@ -196,13 +196,13 @@ func TestParseLabels_InvalidManagedBy(t *testing.T) {
 // an error when the config-pattern label has an invalid value.
 func TestParseLabels_InvalidConfigPattern(t *testing.T) {
 	labels := map[string]string{
-		LabelManagedBy:    ManagedByValue,
-		LabelName:         "test",
-		LabelBranch:       "main",
-		LabelWorktreePath: "/tmp/wt",
-		LabelSourceRepo:   "/tmp/repo",
+		LabelManagedBy:     ManagedByValue,
+		LabelName:          "test",
+		LabelBranch:        "main",
+		LabelWorktreePath:  "/tmp/wt",
+		LabelSourceRepo:    "/tmp/repo",
 		LabelConfigPattern: "invalid-pattern",
-		LabelCreatedAt:    "2026-01-01T00:00:00Z",
+		LabelCreatedAt:     "2026-01-01T00:00:00Z",
 	}
 
 	_, err := ParseLabels(labels)
@@ -214,13 +214,13 @@ func TestParseLabels_InvalidConfigPattern(t *testing.T) {
 // an error when the created-at label has an unparseable timestamp.
 func TestParseLabels_InvalidCreatedAt(t *testing.T) {
 	labels := map[string]string{
-		LabelManagedBy:    ManagedByValue,
-		LabelName:         "test",
-		LabelBranch:       "main",
-		LabelWorktreePath: "/tmp/wt",
-		LabelSourceRepo:   "/tmp/repo",
+		LabelManagedBy:     ManagedByValue,
+		LabelName:          "test",
+		LabelBranch:        "main",
+		LabelWorktreePath:  "/tmp/wt",
+		LabelSourceRepo:    "/tmp/repo",
 		LabelConfigPattern: "image",
-		LabelCreatedAt:    "not-a-timestamp",
+		LabelCreatedAt:     "not-a-timestamp",
 	}
 
 	_, err := ParseLabels(labels)

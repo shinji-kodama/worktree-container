@@ -19,7 +19,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/shinji-kodama/worktree-container/internal/model"
+	"github.com/mmr-tortoise/worktree-container/internal/model"
 	"github.com/tidwall/jsonc"
 )
 
@@ -248,7 +248,7 @@ func ExtractPorts(raw *RawDevContainer, defaultServiceName string) []model.PortS
 // parseServicePort parses a "service:port" string into a PortSpec.
 // If the string contains a colon, it's treated as "serviceName:containerPort".
 // If parsing fails, returns nil.
-func parseServicePort(s string, defaultServiceName string) *model.PortSpec {
+func parseServicePort(s, defaultServiceName string) *model.PortSpec {
 	parts := strings.SplitN(s, ":", 2)
 	if len(parts) != 2 {
 		// No colon found — try to parse as a plain port number.
@@ -327,7 +327,7 @@ func parseAppPort(appPort interface{}, defaultServiceName string) []model.PortSp
 
 // parseAppPortString parses a single appPort string entry.
 // Format: "hostPort:containerPort" or just "containerPort".
-func parseAppPortString(s string, defaultServiceName string) *model.PortSpec {
+func parseAppPortString(s, defaultServiceName string) *model.PortSpec {
 	parts := strings.SplitN(s, ":", 2)
 
 	if len(parts) == 2 {

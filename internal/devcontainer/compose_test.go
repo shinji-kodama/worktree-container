@@ -5,7 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/shinji-kodama/worktree-container/internal/model"
+	"github.com/mmr-tortoise/worktree-container/internal/model"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"gopkg.in/yaml.v3"
@@ -82,8 +82,8 @@ func TestGenerateComposeOverride_MultiService(t *testing.T) {
 	}
 
 	labels := map[string]string{
-		"worktree.managed-by":    "worktree-container",
-		"worktree.name":          "feature-multi",
+		"worktree.managed-by":     "worktree-container",
+		"worktree.name":           "feature-multi",
 		"worktree.config-pattern": "compose-multi",
 	}
 
@@ -141,13 +141,13 @@ func TestGenerateComposeOverride_MultiService(t *testing.T) {
 func TestGenerateComposeOverride_Labels(t *testing.T) {
 	// Use a comprehensive label set matching what BuildLabels would produce.
 	labels := map[string]string{
-		"worktree.managed-by":    "worktree-container",
-		"worktree.name":          "label-test",
-		"worktree.branch":        "feature/labels",
-		"worktree.worktree-path": "/Users/user/project-label-test",
-		"worktree.source-repo":   "/Users/user/project",
+		"worktree.managed-by":     "worktree-container",
+		"worktree.name":           "label-test",
+		"worktree.branch":         "feature/labels",
+		"worktree.worktree-path":  "/Users/user/project-label-test",
+		"worktree.source-repo":    "/Users/user/project",
 		"worktree.config-pattern": "compose-single",
-		"worktree.created-at":    "2026-02-28T10:00:00Z",
+		"worktree.created-at":     "2026-02-28T10:00:00Z",
 	}
 
 	services := []string{"app"}
@@ -221,8 +221,8 @@ func TestGenerateComposeOverride_ServiceWithoutPorts(t *testing.T) {
 
 // TestRewriteComposeConfig verifies that the devcontainer.json is correctly
 // rewritten for Compose patterns:
-//   1. name → changed to envName
-//   2. dockerComposeFile → override YAML path appended to the array
+//  1. name → changed to envName
+//  2. dockerComposeFile → override YAML path appended to the array
 func TestRewriteComposeConfig(t *testing.T) {
 	// Arrange: original devcontainer.json with a single Compose file.
 	rawJSON := []byte(`{

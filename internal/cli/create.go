@@ -26,11 +26,11 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/shinji-kodama/worktree-container/internal/devcontainer"
-	"github.com/shinji-kodama/worktree-container/internal/docker"
-	"github.com/shinji-kodama/worktree-container/internal/model"
-	"github.com/shinji-kodama/worktree-container/internal/port"
-	"github.com/shinji-kodama/worktree-container/internal/worktree"
+	"github.com/mmr-tortoise/worktree-container/internal/devcontainer"
+	"github.com/mmr-tortoise/worktree-container/internal/docker"
+	"github.com/mmr-tortoise/worktree-container/internal/model"
+	"github.com/mmr-tortoise/worktree-container/internal/port"
+	"github.com/mmr-tortoise/worktree-container/internal/worktree"
 )
 
 // createFlags holds the flag values for the create command.
@@ -107,8 +107,8 @@ func runCreate(ctx context.Context, branchName string, flags *createFlags) error
 	if envName == "" {
 		envName = sanitizeBranchName(branchName)
 	}
-	if err := model.ValidateName(envName); err != nil {
-		return model.WrapCLIError(model.ExitGeneralError, "invalid environment name", err)
+	if validateErr := model.ValidateName(envName); validateErr != nil {
+		return model.WrapCLIError(model.ExitGeneralError, "invalid environment name", validateErr)
 	}
 	VerboseLog("Environment name: %s", envName)
 
@@ -128,8 +128,8 @@ func runCreate(ctx context.Context, branchName string, flags *createFlags) error
 
 	// Step 4: Create Git worktree.
 	VerboseLog("Creating Git worktree for branch %q...", branchName)
-	if err := wm.Add(repoRoot, branchName, worktreePath, flags.base); err != nil {
-		return model.WrapCLIError(model.ExitGitError, "failed to create worktree", err)
+	if addErr := wm.Add(repoRoot, branchName, worktreePath, flags.base); addErr != nil {
+		return model.WrapCLIError(model.ExitGitError, "failed to create worktree", addErr)
 	}
 	VerboseLog("Git worktree created successfully")
 
@@ -240,8 +240,8 @@ func runCreate(ctx context.Context, branchName string, flags *createFlags) error
 		}
 
 		overridePath := filepath.Join(dstDevcontainerDir, "docker-compose.worktree.yml")
-		if err := devcontainer.WriteComposeOverride(overridePath, overrideData); err != nil {
-			return model.WrapCLIError(model.ExitGeneralError, "failed to write Compose override", err)
+		if writeErr := devcontainer.WriteComposeOverride(overridePath, overrideData); writeErr != nil {
+			return model.WrapCLIError(model.ExitGeneralError, "failed to write Compose override", writeErr)
 		}
 		VerboseLog("Compose override written to: %s", overridePath)
 
@@ -338,7 +338,7 @@ func determineWorktreeIndex(ctx context.Context) (int, error) {
 	if err != nil {
 		return 1, err
 	}
-	defer cli.Close()
+	defer func() { _ = cli.Close() }()
 
 	containers, err := docker.ListManagedContainers(ctx, cli)
 	if err != nil {
@@ -364,7 +364,7 @@ func loadExistingAllocations(ctx context.Context) ([]model.PortAllocation, error
 	if err != nil {
 		return nil, err
 	}
-	defer cli.Close()
+	defer func() { _ = cli.Close() }()
 
 	containers, err := docker.ListManagedContainers(ctx, cli)
 	if err != nil {
@@ -388,9 +388,7 @@ func startContainers(ctx context.Context, pattern model.ConfigPattern, devcontai
 		// Pattern C/D: Use docker compose with the override file.
 		// Build the full list of compose files: originals + override.
 		allComposeFiles := make([]string, 0, len(composeFiles)+1)
-		for _, cf := range composeFiles {
-			allComposeFiles = append(allComposeFiles, cf)
-		}
+		allComposeFiles = append(allComposeFiles, composeFiles...)
 		allComposeFiles = append(allComposeFiles, "docker-compose.worktree.yml")
 
 		envVars := map[string]string{

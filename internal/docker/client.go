@@ -16,7 +16,7 @@ import (
 
 	"github.com/docker/docker/client"
 
-	"github.com/shinji-kodama/worktree-container/internal/model"
+	"github.com/mmr-tortoise/worktree-container/internal/model"
 )
 
 // defaultPingTimeout is the maximum duration to wait for a Docker daemon
@@ -144,10 +144,10 @@ func detectDockerHost() (string, error) {
 			// Pipe is reachable — close the probe connection immediately.
 			// defer is not used here because we want explicit control over
 			// the close timing before returning.
-			conn.Close()
+			_ = conn.Close()
 			return "npipe://" + pipePath, nil
 		}
-		return "", fmt.Errorf("Docker named pipe not found at %s: %w", pipePath, err)
+		return "", fmt.Errorf("docker named pipe not found at %s: %w", pipePath, err)
 
 	default:
 		return "", fmt.Errorf("unsupported platform: %s", runtime.GOOS)
@@ -169,7 +169,7 @@ func detectUnixSocket(paths []string) (string, error) {
 		}
 	}
 	return "", fmt.Errorf(
-		"Docker socket not found at any of: %v — is Docker running?",
+		"docker socket not found at any of: %v — is Docker running?",
 		paths,
 	)
 }

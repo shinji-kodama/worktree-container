@@ -36,11 +36,13 @@ func TestIsPortAvailable_UsedPort(t *testing.T) {
 	listener, err := net.Listen("tcp", ":0")
 	require.NoError(t, err, "failed to start test listener")
 	// defer ensures cleanup even if the test fails partway through.
-	defer listener.Close()
+	defer func() { _ = listener.Close() }()
 
 	// Extract the actual port the OS assigned to our listener.
 	// listener.Addr() returns a net.Addr; for TCP it's a *net.TCPAddr.
-	port := listener.Addr().(*net.TCPAddr).Port
+	tcpAddr, ok := listener.Addr().(*net.TCPAddr)
+	require.True(t, ok)
+	port := tcpAddr.Port
 
 	scanner := NewScanner()
 	available := scanner.IsPortAvailable(port, "tcp")
@@ -53,9 +55,11 @@ func TestIsPortAvailable_UDP(t *testing.T) {
 	// Open a UDP socket on an OS-assigned port.
 	conn, err := net.ListenPacket("udp", ":0")
 	require.NoError(t, err, "failed to start test UDP listener")
-	defer conn.Close()
+	defer func() { _ = conn.Close() }()
 
-	port := conn.LocalAddr().(*net.UDPAddr).Port
+	udpAddr, ok := conn.LocalAddr().(*net.UDPAddr)
+	require.True(t, ok)
+	port := udpAddr.Port
 
 	scanner := NewScanner()
 	available := scanner.IsPortAvailable(port, "udp")
@@ -121,7 +125,7 @@ func TestFindAvailablePort_NoneAvailable(t *testing.T) {
 	// Clean up all listeners when the test completes.
 	defer func() {
 		for _, ln := range listeners {
-			ln.Close()
+			_ = ln.Close()
 		}
 	}()
 
@@ -139,9 +143,11 @@ func TestGetUsedPorts(t *testing.T) {
 	// Start a listener on an OS-assigned port.
 	listener, err := net.Listen("tcp", ":0")
 	require.NoError(t, err)
-	defer listener.Close()
+	defer func() { _ = listener.Close() }()
 
-	port := listener.Addr().(*net.TCPAddr).Port
+	tcpAddr, ok := listener.Addr().(*net.TCPAddr)
+	require.True(t, ok)
+	port := tcpAddr.Port
 
 	// Scan a range that includes our occupied port.
 	used := scanner.GetUsedPorts(port, port)

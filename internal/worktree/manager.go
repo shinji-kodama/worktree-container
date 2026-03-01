@@ -22,7 +22,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/shinji-kodama/worktree-container/internal/model"
+	"github.com/mmr-tortoise/worktree-container/internal/model"
 )
 
 // WorktreeInfo holds metadata about a single Git worktree entry
@@ -81,7 +81,7 @@ func NewManager() *Manager {
 //   - branch: the branch name to create or check out
 //   - worktreePath: absolute path where the new worktree will be created
 //   - baseBranch: the branch to base the new branch on (empty string means HEAD)
-func (m *Manager) Add(repoPath, branch, worktreePath string, baseBranch string) error {
+func (m *Manager) Add(repoPath, branch, worktreePath, baseBranch string) error {
 	// Check if the branch already exists to decide which git command form to use.
 	// If the branch exists, we cannot use -b (it would fail with "already exists").
 	if m.BranchExists(repoPath, branch) {
@@ -317,8 +317,8 @@ func parsePorcelainOutput(output string) []WorktreeInfo {
 			if current != nil {
 				current.IsBare = true
 			}
-		// "detached" is another possible marker — we don't need to track it
-		// explicitly because a detached HEAD simply has an empty Branch field.
+			// "detached" is another possible marker — we don't need to track it
+			// explicitly because a detached HEAD simply has an empty Branch field.
 		}
 	}
 

@@ -17,8 +17,8 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/shinji-kodama/worktree-container/internal/docker"
-	"github.com/shinji-kodama/worktree-container/internal/model"
+	"github.com/mmr-tortoise/worktree-container/internal/docker"
+	"github.com/mmr-tortoise/worktree-container/internal/model"
 )
 
 // NewStopCommand creates the "stop" cobra command.
@@ -57,7 +57,7 @@ func runStop(ctx context.Context, envName string) error {
 	if err != nil {
 		return err // NewClient already returns CLIError with ExitDockerNotRunning
 	}
-	defer cli.Close()
+	defer func() { _ = cli.Close() }()
 
 	VerboseLog("Connected to Docker daemon")
 

@@ -1,0 +1,44 @@
+# yaml-language-server: $schema=https://aka.ms/winget-manifest.installer.1.9.0.schema.json
+# ─────────────────────────────────────────────────────────────────────
+# WinGet Installer Manifest for worktree-container
+#
+# Directory in winget-pkgs:
+#   manifests/s/mmr-tortoise/worktree-container/{{VERSION}}/
+#
+# File name: mmr-tortoise.worktree-container.installer.yaml
+#
+# Notes:
+#   - InstallerType "zip" requires NestedInstallerType and NestedInstallerFiles
+#   - NestedInstallerType "portable" makes the exe available directly
+#     without a traditional installer (no registry entries, no uninstaller)
+#   - PortableCommandAlias creates a command alias so users can run
+#     "worktree-container" from the command line after installation
+#   - UpgradeBehavior "uninstallPrevious" ensures clean upgrades
+#   - GoReleaser produces zip archives for Windows with the naming pattern:
+#     worktree-container_{{VERSION}}_windows_amd64.zip
+#     worktree-container_{{VERSION}}_windows_arm64.zip
+# ─────────────────────────────────────────────────────────────────────
+PackageIdentifier: mmr-tortoise.worktree-container
+PackageVersion: "{{VERSION}}"
+InstallerLocale: en-US
+InstallerType: zip
+ReleaseDate: "{{RELEASE_DATE}}"
+Installers:
+  - Architecture: x64
+    NestedInstallerType: portable
+    NestedInstallerFiles:
+      - RelativeFilePath: worktree-container.exe
+        PortableCommandAlias: worktree-container
+    InstallerUrl: https://github.com/mmr-tortoise/worktree-container/releases/download/v{{VERSION}}/worktree-container_{{VERSION}}_windows_amd64.zip
+    InstallerSha256: "{{SHA256_X64}}"
+    UpgradeBehavior: uninstallPrevious
+  - Architecture: arm64
+    NestedInstallerType: portable
+    NestedInstallerFiles:
+      - RelativeFilePath: worktree-container.exe
+        PortableCommandAlias: worktree-container
+    InstallerUrl: https://github.com/mmr-tortoise/worktree-container/releases/download/v{{VERSION}}/worktree-container_{{VERSION}}_windows_arm64.zip
+    InstallerSha256: "{{SHA256_ARM64}}"
+    UpgradeBehavior: uninstallPrevious
+ManifestType: installer
+ManifestVersion: 1.9.0

@@ -1,5 +1,5 @@
 # Binaries
-worktree-container
+/worktree-container
 *.exe
 *.exe~
 *.dll

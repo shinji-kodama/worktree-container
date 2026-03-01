@@ -24,19 +24,19 @@ Git ワークツリーごとに独立した Dev Container 環境を自動構築�
 ### Homebrew（macOS / Linux）
 
 ```bash
-brew install shinji-kodama/tap/worktree-container
+brew install mmr-tortoise/tap/worktree-container
 ```
 
 ### go install
 
 ```bash
-go install github.com/shinji-kodama/worktree-container/cmd/worktree-container@latest
+go install github.com/mmr-tortoise/worktree-container/cmd/worktree-container@latest
 ```
 
 ### ソースからビルド
 
 ```bash
-git clone https://github.com/shinji-kodama/worktree-container.git
+git clone https://github.com/mmr-tortoise/worktree-container.git
 cd worktree-container
 go build -o worktree-container ./cmd/worktree-container
 ```
@@ -44,7 +44,7 @@ go build -o worktree-container ./cmd/worktree-container
 ### WinGet（Windows）
 
 ```powershell
-winget install shinji-kodama.worktree-container
+winget install mmr-tortoise.worktree-container
 ```
 
 ## 前提条件
@@ -398,4 +398,4 @@ goreleaser release --snapshot --clean
 
 [MIT License](./LICENSE)
 
-Copyright (c) 2026 shinji-kodama
+Copyright (c) 2026 mmr-tortoise

@@ -47,10 +47,10 @@ func TestParseWorktreeStatus(t *testing.T) {
 		{"running", StatusRunning, false},
 		{"stopped", StatusStopped, false},
 		{"orphaned", StatusOrphaned, false},
-		{"Running", StatusRunning, false},     // case insensitive
-		{"STOPPED", StatusStopped, false},     // case insensitive
-		{"invalid", "", true},                 // unknown value
-		{"", "", true},                        // empty string
+		{"Running", StatusRunning, false}, // case insensitive
+		{"STOPPED", StatusStopped, false}, // case insensitive
+		{"invalid", "", true},             // unknown value
+		{"", "", true},                    // empty string
 	}
 
 	for _, tt := range tests {
@@ -114,7 +114,7 @@ func TestParseConfigPattern(t *testing.T) {
 		{"dockerfile", PatternDockerfile, false},
 		{"compose-single", PatternComposeSingle, false},
 		{"compose-multi", PatternComposeMulti, false},
-		{"IMAGE", PatternImage, false},        // case insensitive
+		{"IMAGE", PatternImage, false}, // case insensitive
 		{"invalid", "", true},
 		{"", "", true},
 	}
@@ -141,16 +141,16 @@ func TestValidateName(t *testing.T) {
 		name     string
 		hasError bool
 	}{
-		{"feature-auth", false},          // valid: alphanumeric with hyphen
-		{"a", false},                     // valid: single character
-		{"feature-auth-v2", false},       // valid: multiple hyphens
-		{"abc123", false},                // valid: alphanumeric
-		{"", true},                       // invalid: empty
-		{"-feature", true},              // invalid: starts with hyphen
-		{"feature-", true},              // invalid: ends with hyphen
-		{"feature auth", true},          // invalid: space
-		{"feature_auth", true},          // invalid: underscore
-		{"feature.auth", true},          // invalid: dot
+		{"feature-auth", false},    // valid: alphanumeric with hyphen
+		{"a", false},               // valid: single character
+		{"feature-auth-v2", false}, // valid: multiple hyphens
+		{"abc123", false},          // valid: alphanumeric
+		{"", true},                 // invalid: empty
+		{"-feature", true},         // invalid: starts with hyphen
+		{"feature-", true},         // invalid: ends with hyphen
+		{"feature auth", true},     // invalid: space
+		{"feature_auth", true},     // invalid: underscore
+		{"feature.auth", true},     // invalid: dot
 	}
 
 	for _, tt := range tests {

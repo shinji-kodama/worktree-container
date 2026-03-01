@@ -84,3 +84,10 @@ Conventional Commits 形式を使用する（`feat:`, `fix:`, `docs:`, `chore:` 
 
 本プロジェクトのドキュメント・マークダウンおよび AI エージェントへの応答は日本語で記述する。
 例外: ソースコード識別子、CLI コマンド名/フラグ名、外部仕様の固有名詞、Conventional Commits プレフィックス。
+
+## Active Technologies
+- Go 1.25（go.mod: `go 1.25.0`） + GoReleaser v2, golangci-lint, GitHub Actions (002-release-preparation)
+- N/A（リリースプロセスのみ） (002-release-preparation)
+
+## Recent Changes
+- 002-release-preparation: Added Go 1.25（go.mod: `go 1.25.0`） + GoReleaser v2, golangci-lint, GitHub Actions

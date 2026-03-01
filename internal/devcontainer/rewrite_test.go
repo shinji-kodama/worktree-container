@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/shinji-kodama/worktree-container/internal/model"
+	"github.com/mmr-tortoise/worktree-container/internal/model"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -16,11 +16,11 @@ import (
 // TestRewriteConfig_PatternA verifies the rewriting behavior for a Pattern A
 // (image-based) devcontainer.json. It checks that all five modifications are
 // correctly applied:
-//   1. name → changed to envName
-//   2. runArgs → label flags appended
-//   3. appPort → rewritten with shifted ports
-//   4. portsAttributes → keys updated to shifted host ports
-//   5. containerEnv → WORKTREE_NAME and WORKTREE_INDEX added
+//  1. name → changed to envName
+//  2. runArgs → label flags appended
+//  3. appPort → rewritten with shifted ports
+//  4. portsAttributes → keys updated to shifted host ports
+//  5. containerEnv → WORKTREE_NAME and WORKTREE_INDEX added
 func TestRewriteConfig_PatternA(t *testing.T) {
 	// Arrange: create a minimal Pattern A devcontainer.json with JSONC comments.
 	// The comment on the first line verifies that JSONC stripping works correctly.
@@ -342,9 +342,9 @@ func TestCopyDevContainerDir(t *testing.T) {
 
 	// Create files that should be copied.
 	files := map[string]string{
-		"Dockerfile":          "FROM node:20\nRUN npm install",
-		"setup.sh":            "#!/bin/bash\necho hello",
-		"docker-compose.yml":  "version: '3'\nservices:\n  app:\n    build: .",
+		"Dockerfile":             "FROM node:20\nRUN npm install",
+		"setup.sh":               "#!/bin/bash\necho hello",
+		"docker-compose.yml":     "version: '3'\nservices:\n  app:\n    build: .",
 		"scripts/post-create.sh": "#!/bin/bash\necho post-create",
 	}
 
@@ -372,8 +372,8 @@ func TestCopyDevContainerDir(t *testing.T) {
 	// Assert: all non-devcontainer.json files are copied with correct content.
 	for path, expectedContent := range files {
 		dstPath := filepath.Join(dstSubDir, path)
-		readBack, err := os.ReadFile(dstPath)
-		require.NoError(t, err, "file %s should exist in destination", path)
+		readBack, readErr := os.ReadFile(dstPath)
+		require.NoError(t, readErr, "file %s should exist in destination", path)
 		assert.Equal(t, expectedContent, string(readBack),
 			"content of %s should match the source", path)
 	}

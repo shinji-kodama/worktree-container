@@ -1,0 +1,36 @@
+# yaml-language-server: $schema=https://aka.ms/winget-manifest.defaultLocale.1.9.0.schema.json
+# ─────────────────────────────────────────────────────────────────────
+# WinGet Default Locale Manifest for worktree-container
+#
+# Directory in winget-pkgs:
+#   manifests/s/mmr-tortoise/worktree-container/{{VERSION}}/
+#
+# File name: mmr-tortoise.worktree-container.locale.en-US.yaml
+# ─────────────────────────────────────────────────────────────────────
+PackageIdentifier: mmr-tortoise.worktree-container
+PackageVersion: "{{VERSION}}"
+PackageLocale: en-US
+Publisher: mmr-tortoise
+PublisherUrl: https://github.com/mmr-tortoise
+PackageName: worktree-container
+PackageUrl: https://github.com/mmr-tortoise/worktree-container
+License: MIT
+LicenseUrl: https://github.com/mmr-tortoise/worktree-container/blob/main/LICENSE
+ShortDescription: Git worktree-aware Dev Container environment manager
+Description: |-
+  CLI tool that automatically builds independent Dev Container environments
+  for each Git worktree. Manages port shifting to prevent port conflicts
+  between multiple worktree environments running simultaneously.
+Moniker: worktree-container
+Tags:
+  - cli
+  - containers
+  - dev-container
+  - devcontainer
+  - docker
+  - git
+  - git-worktree
+  - worktree
+ReleaseNotesUrl: https://github.com/mmr-tortoise/worktree-container/releases/tag/v{{VERSION}}
+ManifestType: defaultLocale
+ManifestVersion: 1.9.0
