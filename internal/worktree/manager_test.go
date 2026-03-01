@@ -58,6 +58,64 @@ func runTestGit(t *testing.T, dir string, args ...string) string {
 	return string(output)
 }
 
+// --- MarkerFile tests ---
+
+// TestWriteAndReadMarkerFile verifies the round-trip of writing and reading
+// a marker file. All fields should be preserved exactly.
+func TestWriteAndReadMarkerFile(t *testing.T) {
+	dir := t.TempDir()
+
+	original := MarkerFile{
+		ManagedBy:      "worktree-container",
+		Name:           "feature-auth",
+		Branch:         "feature/auth",
+		SourceRepoPath: "/path/to/repo",
+		ConfigPattern:  "none",
+		CreatedAt:      "2026-03-02T00:00:00Z",
+	}
+
+	// Write the marker file.
+	err := WriteMarkerFile(dir, original)
+	require.NoError(t, err, "WriteMarkerFile should succeed")
+
+	// Read it back and verify all fields match.
+	read, err := ReadMarkerFile(dir)
+	require.NoError(t, err, "ReadMarkerFile should succeed")
+	require.NotNil(t, read, "ReadMarkerFile should return a non-nil marker")
+
+	assert.Equal(t, original.ManagedBy, read.ManagedBy)
+	assert.Equal(t, original.Name, read.Name)
+	assert.Equal(t, original.Branch, read.Branch)
+	assert.Equal(t, original.SourceRepoPath, read.SourceRepoPath)
+	assert.Equal(t, original.ConfigPattern, read.ConfigPattern)
+	assert.Equal(t, original.CreatedAt, read.CreatedAt)
+}
+
+// TestReadMarkerFile_NotFound verifies that reading from a directory without
+// a marker file returns nil, nil (not an error).
+func TestReadMarkerFile_NotFound(t *testing.T) {
+	dir := t.TempDir()
+
+	marker, err := ReadMarkerFile(dir)
+	assert.NoError(t, err, "ReadMarkerFile should not error for missing file")
+	assert.Nil(t, marker, "ReadMarkerFile should return nil for missing file")
+}
+
+// TestReadMarkerFile_InvalidJSON verifies that a marker file with invalid
+// JSON content returns an error.
+func TestReadMarkerFile_InvalidJSON(t *testing.T) {
+	dir := t.TempDir()
+
+	// Write invalid JSON to the marker file path.
+	markerPath := filepath.Join(dir, MarkerFileName)
+	err := os.WriteFile(markerPath, []byte("{invalid json}"), 0644)
+	require.NoError(t, err)
+
+	marker, err := ReadMarkerFile(dir)
+	assert.Error(t, err, "ReadMarkerFile should error for invalid JSON")
+	assert.Nil(t, marker, "ReadMarkerFile should return nil for invalid JSON")
+}
+
 // TestAdd verifies that Manager.Add creates a new worktree with a new branch.
 // It checks both that the worktree directory is created on disk and that
 // git reports it in the worktree list.

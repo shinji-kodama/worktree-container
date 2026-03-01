@@ -16,6 +16,7 @@
 package worktree
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
 	"os/exec"
@@ -24,6 +25,81 @@ import (
 
 	"github.com/mmr-tortoise/worktree-container/internal/model"
 )
+
+// MarkerFileName is the name of the marker file placed in each managed worktree.
+// This file identifies the worktree as being managed by worktree-container and
+// stores metadata needed for the dual-source (marker + Docker labels) approach.
+const MarkerFileName = ".worktree-container"
+
+// MarkerFile represents the JSON content of the .worktree-container marker file.
+// This file is placed in the root of each managed worktree to allow
+// worktree-container to discover environments even when Docker is unavailable
+// or when no containers have been created (PatternNone).
+type MarkerFile struct {
+	// ManagedBy identifies the tool that manages this worktree.
+	// Always set to "worktree-container".
+	ManagedBy string `json:"managedBy"`
+
+	// Name is the environment name (same as WorktreeEnv.Name).
+	Name string `json:"name"`
+
+	// Branch is the Git branch associated with this worktree.
+	Branch string `json:"branch"`
+
+	// SourceRepoPath is the absolute path to the original Git repository
+	// from which this worktree was created.
+	SourceRepoPath string `json:"sourceRepoPath"`
+
+	// ConfigPattern records the detected devcontainer.json pattern.
+	// Initially set to "none" when no devcontainer.json is found,
+	// then updated to the actual pattern (image, dockerfile, etc.)
+	// once the container configuration is processed.
+	ConfigPattern string `json:"configPattern"`
+
+	// CreatedAt is the ISO 8601 timestamp when this environment was created.
+	CreatedAt string `json:"createdAt"`
+}
+
+// WriteMarkerFile writes a MarkerFile as JSON to the worktree directory.
+// The file is created at <worktreePath>/.worktree-container with 0644 permissions.
+// This function overwrites any existing marker file at the same path.
+func WriteMarkerFile(worktreePath string, marker MarkerFile) error {
+	data, err := json.MarshalIndent(marker, "", "  ")
+	if err != nil {
+		return fmt.Errorf("failed to marshal marker file: %w", err)
+	}
+
+	path := filepath.Join(worktreePath, MarkerFileName)
+	if err := os.WriteFile(path, data, 0o644); err != nil {
+		return fmt.Errorf("failed to write marker file at %s: %w", path, err)
+	}
+
+	return nil
+}
+
+// ReadMarkerFile reads and parses the .worktree-container marker file from
+// the given worktree path. Returns nil, nil if the file does not exist
+// (indicating the worktree is not managed by worktree-container).
+// Returns an error if the file exists but cannot be parsed.
+func ReadMarkerFile(worktreePath string) (*MarkerFile, error) {
+	path := filepath.Join(worktreePath, MarkerFileName)
+
+	data, err := os.ReadFile(path)
+	if err != nil {
+		if os.IsNotExist(err) {
+			// File does not exist — this worktree is not managed.
+			return nil, nil
+		}
+		return nil, fmt.Errorf("failed to read marker file at %s: %w", path, err)
+	}
+
+	var marker MarkerFile
+	if err := json.Unmarshal(data, &marker); err != nil {
+		return nil, fmt.Errorf("failed to parse marker file at %s: %w", path, err)
+	}
+
+	return &marker, nil
+}
 
 // WorktreeInfo holds metadata about a single Git worktree entry
 // as parsed from `git worktree list --porcelain` output.
@@ -120,6 +196,30 @@ func (m *Manager) List(repoPath string) ([]WorktreeInfo, error) {
 	}
 
 	return parsePorcelainOutput(output), nil
+}
+
+// ListPaths returns just the filesystem paths of all worktrees associated with
+// the given repository. This is a convenience wrapper around List() that extracts
+// only the Path field from each WorktreeInfo.
+//
+// Bare worktrees are excluded from the result since they do not have a working
+// directory where marker files could be stored.
+func (m *Manager) ListPaths(repoPath string) ([]string, error) {
+	worktrees, err := m.List(repoPath)
+	if err != nil {
+		return nil, err
+	}
+
+	paths := make([]string, 0, len(worktrees))
+	for _, wt := range worktrees {
+		// Skip bare worktrees — they don't have a working directory.
+		if wt.IsBare {
+			continue
+		}
+		paths = append(paths, wt.Path)
+	}
+
+	return paths, nil
 }
 
 // Remove deletes a Git worktree at the specified path.

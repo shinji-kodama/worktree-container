@@ -381,16 +381,25 @@ func TestFindDevContainerJSON_RootLevel(t *testing.T) {
 	assert.Equal(t, rootFile, found)
 }
 
-// TestFindDevContainerJSON_NotFound verifies that the function returns a
-// CLIError with ExitDevContainerNotFound when no devcontainer.json exists.
+// TestFindDevContainerJSON_NotFound verifies that the function returns
+// an empty string and no error when no devcontainer.json exists.
+// This was changed from returning a CLIError to support optional devcontainer
+// workflows (PatternNone environments).
 func TestFindDevContainerJSON_NotFound(t *testing.T) {
 	// Use an empty temporary directory that has no devcontainer.json.
 	tmpDir := t.TempDir()
 
-	_, err := FindDevContainerJSON(tmpDir)
-	require.Error(t, err)
+	path, err := FindDevContainerJSON(tmpDir)
+	assert.NoError(t, err, "FindDevContainerJSON should not error when file is missing")
+	assert.Empty(t, path, "FindDevContainerJSON should return empty path when file is missing")
+}
 
-	var cliErr *model.CLIError
-	require.True(t, errors.As(err, &cliErr), "error should be a *model.CLIError")
-	assert.Equal(t, model.ExitDevContainerNotFound, cliErr.Code)
+// TestFindDevContainerJSON_NoDevcontainerFixture verifies the no-devcontainer
+// test fixture behaves as expected (no devcontainer.json found).
+func TestFindDevContainerJSON_NoDevcontainerFixture(t *testing.T) {
+	fixturePath := testdataPath(t, "no-devcontainer")
+
+	path, err := FindDevContainerJSON(fixturePath)
+	assert.NoError(t, err, "FindDevContainerJSON should not error for no-devcontainer fixture")
+	assert.Empty(t, path, "FindDevContainerJSON should return empty path for no-devcontainer fixture")
 }

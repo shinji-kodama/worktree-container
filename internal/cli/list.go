@@ -13,14 +13,17 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"os"
 	"sort"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/spf13/cobra"
 
 	"github.com/mmr-tortoise/worktree-container/internal/docker"
 	"github.com/mmr-tortoise/worktree-container/internal/model"
+	"github.com/mmr-tortoise/worktree-container/internal/worktree"
 )
 
 // listFlags holds the flag values for the list command.
@@ -66,59 +69,128 @@ Examples:
 }
 
 // runList is the main logic function for the list command.
-// It connects to Docker, discovers managed environments, applies the
-// status filter, and outputs results in the appropriate format.
+// It uses a dual-source approach: marker files for local discovery and
+// Docker labels for container state. This allows listing environments
+// even when Docker is not running (showing marker-only environments).
 func runList(ctx context.Context, flags *listFlags) error {
 	// Step 1: Validate the --status flag value.
 	statusFilter := flags.status
 	if statusFilter != "all" {
 		if _, err := model.ParseWorktreeStatus(statusFilter); err != nil {
 			return model.WrapCLIError(model.ExitGeneralError,
-				fmt.Sprintf("invalid status filter %q: valid values are running, stopped, orphaned, all", statusFilter), nil)
+				fmt.Sprintf("invalid status filter %q: valid values are running, stopped, orphaned, no-container, all", statusFilter), nil)
 		}
 	}
 
-	// Step 2: Connect to Docker and verify the daemon is available.
+	// Step 2: Discover environments from marker files (local filesystem).
+	// Get the repository root so we can enumerate all worktrees.
+	wm := worktree.NewManager()
+	cwd, err := os.Getwd()
+	if err != nil {
+		return model.WrapCLIError(model.ExitGeneralError, "failed to get current directory", err)
+	}
+
+	repoRoot, err := wm.GetRepoRoot(cwd)
+	if err != nil {
+		return model.WrapCLIError(model.ExitGitError, "not inside a Git repository", err)
+	}
+
+	// Scan all worktree paths for marker files.
+	// Build a map of envName → WorktreeEnv from marker data.
+	markerEnvs := make(map[string]*model.WorktreeEnv)
+	wtPaths, err := wm.ListPaths(repoRoot)
+	if err != nil {
+		VerboseLog("Warning: could not list worktrees: %v", err)
+	} else {
+		for _, wtPath := range wtPaths {
+			marker, readErr := worktree.ReadMarkerFile(wtPath)
+			if readErr != nil {
+				VerboseLog("Warning: could not read marker at %s: %v", wtPath, readErr)
+				continue
+			}
+			if marker == nil {
+				continue // No marker file — not managed by worktree-container.
+			}
+
+			// Parse the creation timestamp from the marker file.
+			createdAt, _ := time.Parse(time.RFC3339, marker.CreatedAt)
+
+			// Parse config pattern from marker, defaulting to PatternNone.
+			configPattern, parseErr := model.ParseConfigPattern(marker.ConfigPattern)
+			if parseErr != nil {
+				configPattern = model.PatternNone
+			}
+
+			env := &model.WorktreeEnv{
+				Name:           marker.Name,
+				Branch:         marker.Branch,
+				WorktreePath:   wtPath,
+				SourceRepoPath: marker.SourceRepoPath,
+				Status:         model.StatusNoContainer,
+				ConfigPattern:  configPattern,
+				CreatedAt:      createdAt,
+			}
+			markerEnvs[marker.Name] = env
+		}
+	}
+	VerboseLog("Found %d marker-based environments", len(markerEnvs))
+
+	// Step 3: Connect to Docker and discover container-based environments.
+	// Docker connection failure is non-fatal — we fall back to marker-only data.
+	var dockerEnvs map[string]*model.WorktreeEnv
+
 	cli, err := docker.NewClient()
 	if err != nil {
-		return err // NewClient already returns CLIError with ExitDockerNotRunning
-	}
-	// defer ensures the Docker client is closed when this function returns,
-	// releasing the underlying HTTP connection and resources.
-	defer func() { _ = cli.Close() }()
+		VerboseLog("Warning: Docker not available, showing marker-only environments: %v", err)
+	} else {
+		defer func() { _ = cli.Close() }()
+		VerboseLog("Connected to Docker daemon")
 
-	VerboseLog("Connected to Docker daemon")
-
-	// Step 3: List all containers that are managed by worktree-container.
-	containers, err := docker.ListManagedContainers(ctx, cli)
-	if err != nil {
-		return err // ListManagedContainers already returns CLIError
-	}
-	VerboseLog("Found %d managed containers", len(containers))
-
-	// Step 4: Group containers by environment name.
-	// Each environment may have one or more containers (e.g., app + db).
-	groups := docker.GroupContainersByEnv(containers)
-
-	// Step 5: Build WorktreeEnv domain objects for each group.
-	var envs []*model.WorktreeEnv
-	for envName, containerGroup := range groups {
-		env, err := docker.BuildWorktreeEnv(envName, containerGroup)
+		containers, err := docker.ListManagedContainers(ctx, cli)
 		if err != nil {
-			// Log the error but continue processing other environments.
-			// A single corrupted environment should not prevent listing others.
-			VerboseLog("Warning: skipping environment %q: %v", envName, err)
-			continue
+			VerboseLog("Warning: could not list Docker containers: %v", err)
+		} else {
+			VerboseLog("Found %d managed containers", len(containers))
+			groups := docker.GroupContainersByEnv(containers)
+
+			dockerEnvs = make(map[string]*model.WorktreeEnv, len(groups))
+			for envName, containerGroup := range groups {
+				env, err := docker.BuildWorktreeEnv(envName, containerGroup)
+				if err != nil {
+					VerboseLog("Warning: skipping environment %q: %v", envName, err)
+					continue
+				}
+				dockerEnvs[envName] = env
+			}
 		}
+	}
+
+	// Step 4: Merge marker and Docker environments.
+	// Docker data takes priority (has live container state).
+	// Marker-only environments are included with StatusNoContainer.
+	merged := make(map[string]*model.WorktreeEnv)
+
+	// Start with marker environments as the base.
+	for name, env := range markerEnvs {
+		merged[name] = env
+	}
+
+	// Overlay Docker environments (takes priority).
+	for name, env := range dockerEnvs {
+		merged[name] = env
+	}
+
+	// Step 5: Convert to sorted slice.
+	envs := make([]*model.WorktreeEnv, 0, len(merged))
+	for _, env := range merged {
 		envs = append(envs, env)
 	}
 
-	// Step 6: Sort environments alphabetically by name for consistent output.
 	sort.Slice(envs, func(i, j int) bool {
 		return envs[i].Name < envs[j].Name
 	})
 
-	// Step 7: Apply the --status filter if specified.
+	// Step 6: Apply the --status filter if specified.
 	if statusFilter != "all" {
 		filteredEnvs := make([]*model.WorktreeEnv, 0, len(envs))
 		for _, env := range envs {
@@ -129,7 +201,7 @@ func runList(ctx context.Context, flags *listFlags) error {
 		envs = filteredEnvs
 	}
 
-	// Step 8: Output results in the appropriate format.
+	// Step 7: Output results in the appropriate format.
 	printListResult(envs)
 	return nil
 }

@@ -133,12 +133,46 @@ func runCreate(ctx context.Context, branchName string, flags *createFlags) error
 	}
 	VerboseLog("Git worktree created successfully")
 
-	// Step 5: Find and parse devcontainer.json in the source repo.
+	// Step 4.5: Place marker file with initial configPattern=none.
+	// The marker file is always created first with PatternNone, then updated
+	// to the actual pattern after devcontainer.json detection and processing.
+	// This ensures the worktree is tracked even if the process is interrupted.
+	marker := worktree.MarkerFile{
+		ManagedBy:      "worktree-container",
+		Name:           envName,
+		Branch:         branchName,
+		SourceRepoPath: repoRoot,
+		ConfigPattern:  string(model.PatternNone),
+		CreatedAt:      time.Now().UTC().Format(time.RFC3339),
+	}
+	if writeErr := worktree.WriteMarkerFile(worktreePath, marker); writeErr != nil {
+		return model.WrapCLIError(model.ExitGeneralError, "failed to write marker file", writeErr)
+	}
+	VerboseLog("Marker file written to worktree")
+
+	// Step 5: Find devcontainer.json in the source repo.
 	// We look in the source repo (not the worktree) for the original config,
 	// as the worktree might not have .devcontainer/ yet.
 	devcontainerPath, err := devcontainer.FindDevContainerJSON(repoRoot)
 	if err != nil {
-		return err // FindDevContainerJSON already returns CLIError
+		return err
+	}
+
+	// If no devcontainer.json found, create a worktree-only environment
+	// with no container configuration (PatternNone).
+	if devcontainerPath == "" {
+		VerboseLog("No devcontainer.json found — creating worktree-only environment")
+		env := &model.WorktreeEnv{
+			Name:           envName,
+			Branch:         branchName,
+			WorktreePath:   worktreePath,
+			SourceRepoPath: repoRoot,
+			Status:         model.StatusNoContainer,
+			ConfigPattern:  model.PatternNone,
+			CreatedAt:      time.Now().UTC(),
+		}
+		printCreateResult(env)
+		return nil
 	}
 	VerboseLog("Found devcontainer.json: %s", devcontainerPath)
 
@@ -165,6 +199,15 @@ func runCreate(ctx context.Context, branchName string, flags *createFlags) error
 
 	pattern := devcontainer.DetectPattern(rawConfig, composeServiceCount)
 	VerboseLog("Detected pattern: %s", pattern)
+
+	// Step 6.5: Update the marker file with the detected config pattern.
+	// The marker was initially created with PatternNone in Step 4.5;
+	// now that we know the actual pattern, update it.
+	marker.ConfigPattern = pattern.String()
+	if updateErr := worktree.WriteMarkerFile(worktreePath, marker); updateErr != nil {
+		return model.WrapCLIError(model.ExitGeneralError, "failed to update marker file", updateErr)
+	}
+	VerboseLog("Marker file updated with pattern: %s", pattern)
 
 	// Step 7: Extract ports and allocate shifted ports.
 	defaultServiceName := envName
@@ -472,16 +515,24 @@ func printCreateResultJSON(env *model.WorktreeEnv) {
 }
 
 // printCreateResultText outputs the create result as human-readable text.
+// For PatternNone environments (no devcontainer.json), only the basic
+// worktree info (name, branch, path) is shown — no Pattern or Services.
 func printCreateResultText(env *model.WorktreeEnv) {
+	fmt.Printf("Created worktree environment %q\n", env.Name)
+	fmt.Printf("  Branch:    %s\n", env.Branch)
+	fmt.Printf("  Path:      %s\n", env.WorktreePath)
+
+	// Skip Pattern and Services display for worktree-only environments.
+	if env.ConfigPattern == model.PatternNone {
+		return
+	}
+
 	serviceCount := len(env.PortAllocations)
 	patternDesc := env.ConfigPattern.String()
 	if serviceCount > 0 {
 		patternDesc = fmt.Sprintf("%s (%d services)", patternDesc, serviceCount)
 	}
 
-	fmt.Printf("Created worktree environment %q\n", env.Name)
-	fmt.Printf("  Branch:    %s\n", env.Branch)
-	fmt.Printf("  Path:      %s\n", env.WorktreePath)
 	fmt.Printf("  Pattern:   %s\n", patternDesc)
 
 	if serviceCount > 0 {

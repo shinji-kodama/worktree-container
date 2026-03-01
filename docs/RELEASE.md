@@ -100,6 +100,7 @@
   - `worktree-container_*_linux_amd64.tar.gz`
   - `worktree-container_*_linux_arm64.tar.gz`
   - `worktree-container_*_windows_amd64.zip`
+  - `worktree-container_*_windows_arm64.zip`
   - `checksums.txt`
 
 - [ ] ローカルプラットフォーム用バイナリで `--version` を確認
@@ -167,10 +168,11 @@
 
   ```bash
   cd packaging/winget/
-  # VERSION, SHA256_X64, SHA256_ARM64 を置換
+  # VERSION, SHA256_X64, SHA256_ARM64, RELEASE_DATE を置換
   sed -i '' 's/{{VERSION}}/<VERSION>/g' *.yaml
   sed -i '' 's/{{SHA256_X64}}/<SHA256_X64>/g' *.yaml
   sed -i '' 's/{{SHA256_ARM64}}/<SHA256_ARM64>/g' *.yaml
+  sed -i '' 's/{{RELEASE_DATE}}/<RELEASE_DATE>/g' *.yaml
   ```
 
 ### 3. PR の提出

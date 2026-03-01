@@ -18,6 +18,7 @@ func TestWorktreeStatus_String(t *testing.T) {
 		{StatusRunning, "running"},
 		{StatusStopped, "stopped"},
 		{StatusOrphaned, "orphaned"},
+		{StatusNoContainer, "no-container"},
 	}
 
 	for _, tt := range tests {
@@ -32,6 +33,7 @@ func TestWorktreeStatus_IsValid(t *testing.T) {
 	assert.True(t, StatusRunning.IsValid())
 	assert.True(t, StatusStopped.IsValid())
 	assert.True(t, StatusOrphaned.IsValid())
+	assert.True(t, StatusNoContainer.IsValid())
 	assert.False(t, WorktreeStatus("invalid").IsValid())
 	assert.False(t, WorktreeStatus("").IsValid())
 }
@@ -47,10 +49,12 @@ func TestParseWorktreeStatus(t *testing.T) {
 		{"running", StatusRunning, false},
 		{"stopped", StatusStopped, false},
 		{"orphaned", StatusOrphaned, false},
-		{"Running", StatusRunning, false}, // case insensitive
-		{"STOPPED", StatusStopped, false}, // case insensitive
-		{"invalid", "", true},             // unknown value
-		{"", "", true},                    // empty string
+		{"no-container", StatusNoContainer, false},
+		{"Running", StatusRunning, false},          // case insensitive
+		{"STOPPED", StatusStopped, false},          // case insensitive
+		{"NO-CONTAINER", StatusNoContainer, false}, // case insensitive
+		{"invalid", "", true},                      // unknown value
+		{"", "", true},                             // empty string
 	}
 
 	for _, tt := range tests {
@@ -76,6 +80,7 @@ func TestConfigPattern_String(t *testing.T) {
 		{PatternDockerfile, "dockerfile"},
 		{PatternComposeSingle, "compose-single"},
 		{PatternComposeMulti, "compose-multi"},
+		{PatternNone, "none"},
 	}
 
 	for _, tt := range tests {
@@ -91,6 +96,7 @@ func TestConfigPattern_IsValid(t *testing.T) {
 	assert.True(t, PatternDockerfile.IsValid())
 	assert.True(t, PatternComposeSingle.IsValid())
 	assert.True(t, PatternComposeMulti.IsValid())
+	assert.True(t, PatternNone.IsValid())
 	assert.False(t, ConfigPattern("invalid").IsValid())
 }
 
@@ -101,6 +107,7 @@ func TestConfigPattern_IsCompose(t *testing.T) {
 	assert.False(t, PatternDockerfile.IsCompose())
 	assert.True(t, PatternComposeSingle.IsCompose())
 	assert.True(t, PatternComposeMulti.IsCompose())
+	assert.False(t, PatternNone.IsCompose())
 }
 
 // TestParseConfigPattern verifies string-to-pattern conversion.
@@ -114,7 +121,9 @@ func TestParseConfigPattern(t *testing.T) {
 		{"dockerfile", PatternDockerfile, false},
 		{"compose-single", PatternComposeSingle, false},
 		{"compose-multi", PatternComposeMulti, false},
+		{"none", PatternNone, false},
 		{"IMAGE", PatternImage, false}, // case insensitive
+		{"NONE", PatternNone, false},   // case insensitive
 		{"invalid", "", true},
 		{"", "", true},
 	}

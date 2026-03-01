@@ -15,11 +15,14 @@
       "Read(./secrets/**)"
     ]
   },
-  "enabledPlugins": {},
+  "enabledPlugins": {
+    "code-review@claude-plugins-official": true
+  },
   "language": "japanese",
   "companyAnnouncements": [
     "Welcome to Acme Corp! Review our code guidelines at docs.acme.com",
     "Reminder: Code reviews required for all PRs",
     "New security policy in effect"
-  ]
+  ],
+  "plansDirectory": ".claude/plans"
 }

@@ -88,6 +88,8 @@ Conventional Commits 形式を使用する（`feat:`, `fix:`, `docs:`, `chore:` 
 ## Active Technologies
 - Go 1.25（go.mod: `go 1.25.0`） + GoReleaser v2, golangci-lint, GitHub Actions (002-release-preparation)
 - N/A（リリースプロセスのみ） (002-release-preparation)
+- Go 1.25 + spf13/cobra, docker/docker/client, compose-spec/compose-go/v2, tidwall/jsonc, stretchr/testify (003-optional-devcontainer)
+- マーカーファイル（JSON）+ Docker コンテナラベル（既存） (003-optional-devcontainer)
 
 ## Recent Changes
 - 002-release-preparation: Added Go 1.25（go.mod: `go 1.25.0`） + GoReleaser v2, golangci-lint, GitHub Actions

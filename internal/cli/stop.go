@@ -13,12 +13,15 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"os"
 	"path/filepath"
+	"time"
 
 	"github.com/spf13/cobra"
 
 	"github.com/mmr-tortoise/worktree-container/internal/docker"
 	"github.com/mmr-tortoise/worktree-container/internal/model"
+	"github.com/mmr-tortoise/worktree-container/internal/worktree"
 )
 
 // NewStopCommand creates the "stop" cobra command.
@@ -52,14 +55,16 @@ Examples:
 // It finds the named environment, determines the appropriate stop strategy
 // (Compose vs. individual containers), and executes the stop operation.
 func runStop(ctx context.Context, envName string) error {
-	// Step 1: Connect to Docker daemon.
+	// Step 1: Try to connect to Docker daemon.
+	// Docker may not be needed for PatternNone environments.
 	cli, err := docker.NewClient()
 	if err != nil {
-		return err // NewClient already returns CLIError with ExitDockerNotRunning
+		VerboseLog("Warning: Docker not available: %v", err)
+		cli = nil
+	} else {
+		defer func() { _ = cli.Close() }()
+		VerboseLog("Connected to Docker daemon")
 	}
-	defer func() { _ = cli.Close() }()
-
-	VerboseLog("Connected to Docker daemon")
 
 	// Step 2: Find the target environment by listing all managed containers
 	// and looking for ones with the matching environment name.
@@ -69,6 +74,13 @@ func runStop(ctx context.Context, envName string) error {
 	}
 
 	VerboseLog("Found environment %q with %d containers", envName, len(containers))
+
+	// Step 2.5: Handle environments with no container configuration.
+	// PatternNone environments have no containers to stop.
+	if env.ConfigPattern == model.PatternNone {
+		fmt.Printf("Environment %q has no container configuration. Nothing to stop.\n", envName)
+		return nil
+	}
 
 	// Step 3: Stop containers based on the configuration pattern.
 	if env.ConfigPattern.IsCompose() {
@@ -126,34 +138,107 @@ func printStopResultText(envName string, containerCount int) {
 		envName, containerCount)
 }
 
-// findEnvironment looks up a worktree environment by name from Docker containers.
-// It returns the environment metadata, the list of containers belonging to it,
-// and an error if the environment is not found or Docker operations fail.
+// findEnvironment looks up a worktree environment by name.
+// It first searches Docker containers, then falls back to marker files
+// if Docker doesn't have the environment (e.g., PatternNone environments
+// that have no containers).
+//
+// Returns the environment metadata, the list of containers belonging to it
+// (may be empty for marker-only environments), and an error if the
+// environment is not found.
 //
 // This is a shared helper used by stop, start, and remove commands.
 func findEnvironment(ctx context.Context, cli *docker.Client, envName string) (*model.WorktreeEnv, []model.ContainerInfo, error) {
-	// List all managed containers.
-	allContainers, err := docker.ListManagedContainers(ctx, cli)
+	// Step 1: Try Docker-based lookup first (has live container state).
+	if cli != nil {
+		allContainers, err := docker.ListManagedContainers(ctx, cli)
+		if err != nil {
+			VerboseLog("Warning: could not list Docker containers: %v", err)
+		} else {
+			groups := docker.GroupContainersByEnv(allContainers)
+			containers, ok := groups[envName]
+			if ok && len(containers) > 0 {
+				env, err := docker.BuildWorktreeEnv(envName, containers)
+				if err != nil {
+					return nil, nil, model.WrapCLIError(model.ExitGeneralError,
+						fmt.Sprintf("failed to parse environment %q metadata", envName), err)
+				}
+				return env, containers, nil
+			}
+		}
+	}
+
+	// Step 2: Fall back to marker file search.
+	// Scan all worktrees in the repository for a matching marker file.
+	env, err := findEnvironmentFromMarker(envName)
 	if err != nil {
 		return nil, nil, err
 	}
-
-	// Group by environment name.
-	groups := docker.GroupContainersByEnv(allContainers)
-
-	// Look up the target environment.
-	containers, ok := groups[envName]
-	if !ok || len(containers) == 0 {
-		return nil, nil, model.NewCLIError(model.ExitEnvNotFound,
-			fmt.Sprintf("worktree environment %q not found", envName))
+	if env != nil {
+		return env, nil, nil
 	}
 
-	// Build the WorktreeEnv domain object from container labels.
-	env, err := docker.BuildWorktreeEnv(envName, containers)
+	return nil, nil, model.NewCLIError(model.ExitEnvNotFound,
+		fmt.Sprintf("worktree environment %q not found", envName))
+}
+
+// findEnvironmentFromMarker searches for an environment by name using marker
+// files in worktree directories. Returns nil, nil if not found.
+func findEnvironmentFromMarker(envName string) (*model.WorktreeEnv, error) {
+	wm := worktree.NewManager()
+
+	cwd, err := os.Getwd()
 	if err != nil {
-		return nil, nil, model.WrapCLIError(model.ExitGeneralError,
-			fmt.Sprintf("failed to parse environment %q metadata", envName), err)
+		VerboseLog("Warning: could not get current directory: %v", err)
+		return nil, nil
 	}
 
-	return env, containers, nil
+	repoRoot, err := wm.GetRepoRoot(cwd)
+	if err != nil {
+		VerboseLog("Warning: not inside a Git repository: %v", err)
+		return nil, nil
+	}
+
+	wtPaths, err := wm.ListPaths(repoRoot)
+	if err != nil {
+		VerboseLog("Warning: could not list worktrees: %v", err)
+		return nil, nil
+	}
+
+	for _, wtPath := range wtPaths {
+		marker, err := worktree.ReadMarkerFile(wtPath)
+		if err != nil || marker == nil {
+			continue
+		}
+
+		if marker.Name != envName {
+			continue
+		}
+
+		// Found a matching marker — build a WorktreeEnv from it.
+		createdAt, _ := time.Parse(time.RFC3339, marker.CreatedAt)
+		configPattern, parseErr := model.ParseConfigPattern(marker.ConfigPattern)
+		if parseErr != nil {
+			configPattern = model.PatternNone
+		}
+
+		// Determine status based on config pattern.
+		status := model.StatusNoContainer
+		if configPattern != model.PatternNone {
+			status = model.StatusStopped
+		}
+
+		env := &model.WorktreeEnv{
+			Name:           marker.Name,
+			Branch:         marker.Branch,
+			WorktreePath:   wtPath,
+			SourceRepoPath: marker.SourceRepoPath,
+			Status:         status,
+			ConfigPattern:  configPattern,
+			CreatedAt:      createdAt,
+		}
+		return env, nil
+	}
+
+	return nil, nil
 }

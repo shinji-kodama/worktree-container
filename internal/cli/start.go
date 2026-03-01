@@ -19,6 +19,7 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"github.com/mmr-tortoise/worktree-container/internal/devcontainer"
 	"github.com/mmr-tortoise/worktree-container/internal/docker"
 	"github.com/mmr-tortoise/worktree-container/internal/model"
 	"github.com/mmr-tortoise/worktree-container/internal/port"
@@ -55,14 +56,17 @@ Examples:
 // It finds the named environment, checks port availability, and starts
 // all containers.
 func runStart(ctx context.Context, envName string) error {
-	// Step 1: Connect to Docker daemon.
+	// Step 1: Try to connect to Docker daemon.
+	// Docker may not be needed for PatternNone environments, so connection
+	// failure is deferred until we know the pattern.
 	cli, err := docker.NewClient()
 	if err != nil {
-		return err
+		VerboseLog("Warning: Docker not available: %v", err)
+		cli = nil
+	} else {
+		defer func() { _ = cli.Close() }()
+		VerboseLog("Connected to Docker daemon")
 	}
-	defer func() { _ = cli.Close() }()
-
-	VerboseLog("Connected to Docker daemon")
 
 	// Step 2: Find the target environment.
 	env, containers, err := findEnvironment(ctx, cli, envName)
@@ -71,6 +75,35 @@ func runStart(ctx context.Context, envName string) error {
 	}
 
 	VerboseLog("Found environment %q with %d containers", envName, len(containers))
+
+	// Step 2.5: Handle environments with no container configuration.
+	// Check if a devcontainer.json has been added since the environment was created.
+	// If found, inform the user to run `remove --keep-worktree` + `create` to set up
+	// the full container environment (port allocation, config rewrite, etc.).
+	if env.ConfigPattern == model.PatternNone {
+		VerboseLog("Environment %q has PatternNone, checking for newly added devcontainer.json...", envName)
+
+		devcontainerPath, findErr := devcontainer.FindDevContainerJSON(env.WorktreePath)
+		if findErr != nil {
+			VerboseLog("Warning: error searching for devcontainer.json: %v", findErr)
+		}
+
+		if devcontainerPath == "" {
+			// No devcontainer.json found — nothing to start.
+			fmt.Printf("Environment %q has no container configuration.\n", envName)
+			fmt.Println("To add containers, create a .devcontainer/devcontainer.json in the worktree.")
+			return nil
+		}
+
+		// devcontainer.json found, but start cannot perform the full setup
+		// (port allocation, config rewrite, container creation) that create does.
+		// Guide the user to re-create the environment.
+		fmt.Printf("Environment %q has a devcontainer.json but was created without container support.\n", envName)
+		fmt.Println("To set up containers, re-create the environment:")
+		fmt.Printf("  worktree-container remove --force --keep-worktree %s\n", envName)
+		fmt.Printf("  worktree-container create %s\n", env.Branch)
+		return nil
+	}
 
 	// Step 3: Verify port availability before starting.
 	// This prevents starting containers that would fail to bind ports or

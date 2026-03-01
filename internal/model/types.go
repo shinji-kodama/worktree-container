@@ -4,9 +4,10 @@
 // in the data-model.md specification. These types are used throughout the
 // application for passing data between components.
 //
-// Key design decision: All state is persisted via Docker container labels
-// (FR-011), so these types are transient representations reconstructed
-// from Docker API queries at runtime.
+// Key design decision: State is persisted via two complementary sources:
+// Docker container labels (FR-011) for live container metadata, and
+// marker files (.worktree-container) for worktree-level metadata.
+// These types are reconstructed at runtime from one or both sources.
 package model
 
 import (
@@ -35,6 +36,11 @@ const (
 	// but Docker containers/resources remain. This typically happens when
 	// a user manually deletes the worktree directory.
 	StatusOrphaned WorktreeStatus = "orphaned"
+
+	// StatusNoContainer indicates a worktree environment that has no
+	// associated container configuration (no devcontainer.json).
+	// The worktree exists but no Docker resources are managed.
+	StatusNoContainer WorktreeStatus = "no-container"
 )
 
 // String returns the string representation of WorktreeStatus.
@@ -48,7 +54,7 @@ func (s WorktreeStatus) String() string {
 // predefined valid states.
 func (s WorktreeStatus) IsValid() bool {
 	switch s {
-	case StatusRunning, StatusStopped, StatusOrphaned:
+	case StatusRunning, StatusStopped, StatusOrphaned, StatusNoContainer:
 		return true
 	default:
 		return false
@@ -60,7 +66,7 @@ func (s WorktreeStatus) IsValid() bool {
 func ParseWorktreeStatus(s string) (WorktreeStatus, error) {
 	status := WorktreeStatus(strings.ToLower(s))
 	if !status.IsValid() {
-		return "", fmt.Errorf("invalid worktree status: %q (valid: running, stopped, orphaned)", s)
+		return "", fmt.Errorf("invalid worktree status: %q (valid: running, stopped, orphaned, no-container)", s)
 	}
 	return status, nil
 }
@@ -92,6 +98,11 @@ const (
 	// PatternComposeMulti (Pattern D) uses Docker Compose with multiple services.
 	// Example: {"dockerComposeFile": ["docker-compose.yml"], "service": "app", "runServices": ["app", "db"]}
 	PatternComposeMulti ConfigPattern = "compose-multi"
+
+	// PatternNone indicates that no devcontainer.json exists.
+	// The worktree is managed by worktree-container but has no container
+	// configuration. Containers can be added later by creating a devcontainer.json.
+	PatternNone ConfigPattern = "none"
 )
 
 // String returns the string representation of ConfigPattern.
@@ -103,7 +114,7 @@ func (p ConfigPattern) String() string {
 // predefined valid patterns.
 func (p ConfigPattern) IsValid() bool {
 	switch p {
-	case PatternImage, PatternDockerfile, PatternComposeSingle, PatternComposeMulti:
+	case PatternImage, PatternDockerfile, PatternComposeSingle, PatternComposeMulti, PatternNone:
 		return true
 	default:
 		return false
@@ -122,7 +133,7 @@ func (p ConfigPattern) IsCompose() bool {
 func ParseConfigPattern(s string) (ConfigPattern, error) {
 	pattern := ConfigPattern(strings.ToLower(s))
 	if !pattern.IsValid() {
-		return "", fmt.Errorf("invalid config pattern: %q (valid: image, dockerfile, compose-single, compose-multi)", s)
+		return "", fmt.Errorf("invalid config pattern: %q (valid: image, dockerfile, compose-single, compose-multi, none)", s)
 	}
 	return pattern, nil
 }
@@ -130,9 +141,10 @@ func ParseConfigPattern(s string) (ConfigPattern, error) {
 // WorktreeEnv represents a worktree environment — a Git worktree paired with
 // its Dev Container setup. This is the primary aggregate entity in the domain.
 //
-// All fields are reconstructed at runtime from Docker container labels
-// (see Docker label schema in data-model.md). There is no persistent
-// state file on disk.
+// Fields are reconstructed at runtime from two sources: Docker container
+// labels (see Docker label schema in data-model.md) and marker files
+// (.worktree-container) placed in each managed worktree directory.
+// PatternNone environments rely solely on marker files.
 type WorktreeEnv struct {
 	// Name is the unique identifier for this worktree environment.
 	// Must contain only alphanumeric characters and hyphens.
@@ -154,7 +166,8 @@ type WorktreeEnv struct {
 	ConfigPattern ConfigPattern `json:"configPattern"`
 
 	// Containers holds information about all Docker containers belonging
-	// to this environment. Must contain at least one container.
+	// to this environment. May be empty for PatternNone environments
+	// that have no container configuration.
 	Containers []ContainerInfo `json:"containers,omitempty"`
 
 	// PortAllocations holds all port mappings for this environment.

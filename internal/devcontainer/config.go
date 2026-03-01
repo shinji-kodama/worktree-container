@@ -399,8 +399,9 @@ func GetComposeFiles(raw *RawDevContainer) []string {
 //  1. <projectPath>/.devcontainer/devcontainer.json (preferred, most common)
 //  2. <projectPath>/.devcontainer.json (alternative, less common)
 //
-// Returns the absolute path to the first found file, or a CLIError
-// with ExitDevContainerNotFound if neither location contains the file.
+// Returns the absolute path to the first found file, or ("", nil) if
+// neither location contains the file. The caller is responsible for
+// handling the absence (e.g., creating a PatternNone environment).
 func FindDevContainerJSON(projectPath string) (string, error) {
 	// Define candidate paths in priority order.
 	// The .devcontainer/ subdirectory is the standard location recommended
@@ -419,8 +420,8 @@ func FindDevContainerJSON(projectPath string) (string, error) {
 		}
 	}
 
-	return "", model.NewCLIError(
-		model.ExitDevContainerNotFound,
-		fmt.Sprintf("devcontainer.json not found in %s (searched .devcontainer/devcontainer.json and .devcontainer.json)", projectPath),
-	)
+	// No devcontainer.json found — return empty string without error.
+	// The caller is responsible for handling the absence of a devcontainer.json
+	// (e.g., creating a worktree-only environment with PatternNone).
+	return "", nil
 }
