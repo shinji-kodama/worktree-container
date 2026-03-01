@@ -50,10 +50,10 @@
 ### Implementation for User Story 1
 
 - [x] T009 [US1] ローカルで golangci-lint を実行し lint エラーがないことを確認（`golangci-lint run`）
-- [ ] T010 [US1] ブランチを push して GitHub Actions CI ワークフローの実行を開始
-- [ ] T011 [US1] GitHub Actions の build ジョブが全マトリクスで成功することを確認
-- [ ] T012 [US1] GitHub Actions の lint ジョブが成功することを確認
-- [ ] T013 [US1] GitHub Actions の cross-compile ジョブが成功することを確認（darwin/linux/windows × amd64/arm64）
+- [x] T010 [US1] ブランチを push して GitHub Actions CI ワークフローの実行を開始
+- [x] T011 [US1] GitHub Actions の build ジョブが全マトリクスで成功することを確認
+- [x] T012 [US1] GitHub Actions の lint ジョブが成功することを確認
+- [x] T013 [US1] GitHub Actions の cross-compile ジョブが成功することを確認（darwin/linux/windows × amd64/arm64）
 
 **Checkpoint**: CI が全ジョブ通過。リリース品質のコードであることが保証された状態
 
@@ -132,8 +132,8 @@
 
 **Purpose**: 全ストーリーにまたがる最終確認
 
-- [ ] T031 全修正をコミットし、PR を作成（Conventional Commits 形式: `chore: v0.1.0 リリース準備`）
-- [ ] T032 PR の CI が全ジョブ通過することを最終確認
+- [x] T031 全修正をコミットし、PR を作成（Conventional Commits 形式: `chore: v0.1.0 リリース準備`）
+- [x] T032 PR の CI が全ジョブ通過することを最終確認
 - [ ] T033 PR をマージ後、main ブランチでの CI 通過を確認
 
 ---
