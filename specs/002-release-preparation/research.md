@@ -60,7 +60,7 @@
 - GitHub Release の作成も含めてすべてが中断される
 - `release.yml` には既に `HOMEBREW_TAP_TOKEN: ${{ secrets.HOMEBREW_TAP_TOKEN }}` が設定されている
 - **運用タスク**: GitHub Settings > Secrets に PAT を登録する必要がある
-- PAT は `shinji-kodama/homebrew-tap` リポジトリへの書き込み権限が必要
+- PAT は `mmr-tortoise/homebrew-tap` リポジトリへの書き込み権限が必要
 
 ---
 
@@ -75,10 +75,10 @@
 
 **ディレクトリ構成**（`microsoft/winget-pkgs` リポジトリ内）:
 ```
-manifests/s/shinji-kodama/worktree-container/0.1.0/
-├── shinji-kodama.worktree-container.yaml              (version)
-├── shinji-kodama.worktree-container.installer.yaml    (installer)
-└── shinji-kodama.worktree-container.locale.en-US.yaml (defaultLocale)
+manifests/s/mmr-tortoise/worktree-container/0.1.0/
+├── mmr-tortoise.worktree-container.yaml              (version)
+├── mmr-tortoise.worktree-container.installer.yaml    (installer)
+└── mmr-tortoise.worktree-container.locale.en-US.yaml (defaultLocale)
 ```
 
 **テンプレートの配置先**: `packaging/winget/`（clarify で決定済み）

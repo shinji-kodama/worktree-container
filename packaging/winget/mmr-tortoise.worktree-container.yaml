@@ -3,11 +3,11 @@
 # WinGet Version Manifest for worktree-container
 #
 # Directory in winget-pkgs:
-#   manifests/s/shinji-kodama/worktree-container/{{VERSION}}/
+#   manifests/s/mmr-tortoise/worktree-container/{{VERSION}}/
 #
-# File name: shinji-kodama.worktree-container.yaml
+# File name: mmr-tortoise.worktree-container.yaml
 # ─────────────────────────────────────────────────────────────────────
-PackageIdentifier: shinji-kodama.worktree-container
+PackageIdentifier: mmr-tortoise.worktree-container
 PackageVersion: "{{VERSION}}"
 DefaultLocale: en-US
 ManifestType: version

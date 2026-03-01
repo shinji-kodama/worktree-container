@@ -47,7 +47,7 @@
 
 ### User Story 3 - Homebrew Tap リポジトリの準備 (Priority: P2)
 
-開発者として、Homebrew Tap 用のリポジトリ（`shinji-kodama/homebrew-tap`）が GitHub 上に存在し、GoReleaser が Formula を自動的に push できる状態にしたい。
+開発者として、Homebrew Tap 用のリポジトリ（`mmr-tortoise/homebrew-tap`）が GitHub 上に存在し、GoReleaser が Formula を自動的に push できる状態にしたい。
 
 **Why this priority**: macOS/Linux ユーザーにとっての主要なインストール手段。リリースタグを打った際に GoReleaser が自動的に Formula を生成・push するため、事前にリポジトリと認証トークンを準備する必要がある。
 
@@ -55,7 +55,7 @@
 
 **Acceptance Scenarios**:
 
-1. **Given** GitHub アカウント, **When** `shinji-kodama/homebrew-tap` リポジトリを確認する, **Then** リポジトリが存在し、`Formula/` ディレクトリが作成されている
+1. **Given** GitHub アカウント, **When** `mmr-tortoise/homebrew-tap` リポジトリを確認する, **Then** リポジトリが存在し、`Formula/` ディレクトリが作成されている
 2. **Given** Homebrew Tap リポジトリが存在する, **When** `worktree-container` リポジトリの GitHub Secrets を確認する, **Then** `HOMEBREW_TAP_TOKEN` が設定されている
 3. **Given** スナップショットビルドが完了した, **When** GoReleaser の出力を確認する, **Then** Homebrew Formula のテンプレートが正しく生成されている
 
@@ -106,7 +106,7 @@
 - **FR-002**: GoReleaser のスナップショットビルドが全ターゲットプラットフォーム（darwin/linux/windows × amd64/arm64）で成功しなければならない（MUST）
 - **FR-003**: 生成されたバイナリが `--version` フラグでバージョン情報を正しく表示しなければならない（MUST）
 - **FR-004**: GitHub Actions の CI ワークフローが全マトリクスで通過しなければならない（MUST）
-- **FR-005**: Homebrew Tap リポジトリ（`shinji-kodama/homebrew-tap`）が GitHub 上に存在し、`Formula/` ディレクトリが用意されていなければならない（MUST）
+- **FR-005**: Homebrew Tap リポジトリ（`mmr-tortoise/homebrew-tap`）が GitHub 上に存在し、`Formula/` ディレクトリが用意されていなければならない（MUST）
 - **FR-006**: `HOMEBREW_TAP_TOKEN` シークレットがリリース用リポジトリの GitHub Secrets に設定されていなければならない（MUST）
 - **FR-007**: GoReleaser の設定ファイルが Homebrew Formula を正しく生成する設定を含まなければならない（MUST）
 - **FR-008**: WinGet マニフェストテンプレート（`installer.yaml`, `defaultLocale.yaml`, `version.yaml`）が `packaging/winget/` ディレクトリに準備されていなければならない（MUST）
@@ -128,14 +128,14 @@
 - **SC-001**: GitHub Actions CI が全マトリクス（4 パターン）で 100% 成功する
 - **SC-002**: GoReleaser スナップショットビルドが 5 ターゲット（darwin_amd64, darwin_arm64, linux_amd64, linux_arm64, windows_amd64）すべてでアーティファクトを生成する
 - **SC-003**: ローカルプラットフォーム用バイナリで `--version` が意図したバージョン文字列を出力する
-- **SC-004**: macOS/Linux ユーザーが `brew install shinji-kodama/tap/worktree-container` でインストールできるための Homebrew Tap が準備されている
+- **SC-004**: macOS/Linux ユーザーが `brew install mmr-tortoise/tap/worktree-container` でインストールできるための Homebrew Tap が準備されている
 - **SC-005**: Windows ユーザーが `winget install` でインストールできるための WinGet マニフェストテンプレートが準備されている
 - **SC-006**: リリースチェックリストに従って初回リリースのドライランを実行でき、すべてのステップで手戻りが発生しない
 
 ## Assumptions
 
 - 初回リリースのバージョンは `v0.1.0` とする（MVP として全コマンドが実装済み）
-- Homebrew Tap リポジトリ `shinji-kodama/homebrew-tap` は本フィーチャーの中で作成する（まだ存在しない可能性がある）
+- Homebrew Tap リポジトリ `mmr-tortoise/homebrew-tap` は本フィーチャーの中で作成する（まだ存在しない可能性がある）
 - WinGet マニフェストはリリース後に `microsoft/winget-pkgs` リポジトリに PR を提出する手動フローとする（GoReleaser による自動化は行わない）
 - `HOMEBREW_TAP_TOKEN` は GitHub Personal Access Token（classic または fine-grained）で、Homebrew Tap リポジトリへの書き込み権限が必要
 - GoReleaser はローカルにインストール済みであるか、本フィーチャーの中でインストールする

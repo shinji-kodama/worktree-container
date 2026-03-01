@@ -18,7 +18,7 @@ Worktree Container へのコントリビューションを歓迎します。
 ### リポジトリのクローンとビルド
 
 ```bash
-git clone https://github.com/shinji-kodama/worktree-container.git
+git clone https://github.com/mmr-tortoise/worktree-container.git
 cd worktree-container
 go mod download
 go build -o worktree-container ./cmd/worktree-container

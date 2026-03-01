@@ -69,9 +69,9 @@ specs/002-release-preparation/
 
 packaging/
 └── winget/
-    ├── shinji-kodama.worktree-container.yaml           # version manifest
-    ├── shinji-kodama.worktree-container.installer.yaml # installer manifest
-    └── shinji-kodama.worktree-container.locale.en-US.yaml  # defaultLocale manifest
+    ├── mmr-tortoise.worktree-container.yaml           # version manifest
+    ├── mmr-tortoise.worktree-container.installer.yaml # installer manifest
+    └── mmr-tortoise.worktree-container.locale.en-US.yaml  # defaultLocale manifest
 
 docs/
 └── RELEASE.md           # リリース手順チェックリスト（新規作成）
@@ -100,7 +100,7 @@ docs/
 
 ### Phase 3: Homebrew Tap 準備（P2）
 
-1. `shinji-kodama/homebrew-tap` リポジトリの存在確認（なければ作成）
+1. `mmr-tortoise/homebrew-tap` リポジトリの存在確認（なければ作成）
 2. `Formula/` ディレクトリの作成
 3. `HOMEBREW_TAP_TOKEN` の GitHub Secrets 設定（**ユーザー手動操作**）
 
@@ -108,9 +108,9 @@ docs/
 
 1. `packaging/winget/` ディレクトリの作成
 2. 3つのマニフェストテンプレートファイルの作成
-   - `shinji-kodama.worktree-container.yaml`（version）
-   - `shinji-kodama.worktree-container.installer.yaml`（installer）
-   - `shinji-kodama.worktree-container.locale.en-US.yaml`（defaultLocale）
+   - `mmr-tortoise.worktree-container.yaml`（version）
+   - `mmr-tortoise.worktree-container.installer.yaml`（installer）
+   - `mmr-tortoise.worktree-container.locale.en-US.yaml`（defaultLocale）
 3. プレースホルダー（`{{VERSION}}`, `{{SHA256_X64}}` 等）を含むテンプレートとして作成
 
 ### Phase 5: リリース手順書（P3）

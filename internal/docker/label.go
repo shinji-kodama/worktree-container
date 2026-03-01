@@ -6,7 +6,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/shinji-kodama/worktree-container/internal/model"
+	"github.com/mmr-tortoise/worktree-container/internal/model"
 )
 
 // Label key constants define the Docker label keys used to persist

@@ -3,19 +3,19 @@
 # WinGet Default Locale Manifest for worktree-container
 #
 # Directory in winget-pkgs:
-#   manifests/s/shinji-kodama/worktree-container/{{VERSION}}/
+#   manifests/s/mmr-tortoise/worktree-container/{{VERSION}}/
 #
-# File name: shinji-kodama.worktree-container.locale.en-US.yaml
+# File name: mmr-tortoise.worktree-container.locale.en-US.yaml
 # ─────────────────────────────────────────────────────────────────────
-PackageIdentifier: shinji-kodama.worktree-container
+PackageIdentifier: mmr-tortoise.worktree-container
 PackageVersion: "{{VERSION}}"
 PackageLocale: en-US
-Publisher: shinji-kodama
-PublisherUrl: https://github.com/shinji-kodama
+Publisher: mmr-tortoise
+PublisherUrl: https://github.com/mmr-tortoise
 PackageName: worktree-container
-PackageUrl: https://github.com/shinji-kodama/worktree-container
+PackageUrl: https://github.com/mmr-tortoise/worktree-container
 License: MIT
-LicenseUrl: https://github.com/shinji-kodama/worktree-container/blob/main/LICENSE
+LicenseUrl: https://github.com/mmr-tortoise/worktree-container/blob/main/LICENSE
 ShortDescription: Git worktree-aware Dev Container environment manager
 Description: |-
   CLI tool that automatically builds independent Dev Container environments
@@ -31,6 +31,6 @@ Tags:
   - git
   - git-worktree
   - worktree
-ReleaseNotesUrl: https://github.com/shinji-kodama/worktree-container/releases/tag/v{{VERSION}}
+ReleaseNotesUrl: https://github.com/mmr-tortoise/worktree-container/releases/tag/v{{VERSION}}
 ManifestType: defaultLocale
 ManifestVersion: 1.9.0

@@ -80,13 +80,13 @@
 
 **Goal**: Homebrew Tap リポジトリが GitHub 上に存在し、GoReleaser が Formula を自動 push できる状態にする
 
-**Independent Test**: `shinji-kodama/homebrew-tap` リポジトリが存在し、`Formula/` ディレクトリがあり、`HOMEBREW_TAP_TOKEN` が設定されていること
+**Independent Test**: `mmr-tortoise/homebrew-tap` リポジトリが存在し、`Formula/` ディレクトリがあり、`HOMEBREW_TAP_TOKEN` が設定されていること
 
 ### Implementation for User Story 3
 
-- [ ] T018 [US3] `shinji-kodama/homebrew-tap` リポジトリの存在を確認（`gh repo view shinji-kodama/homebrew-tap`）、存在しない場合は作成（`gh repo create shinji-kodama/homebrew-tap --public`）（**リリース時にユーザーが実施** — docs/RELEASE.md 参照）
+- [ ] T018 [US3] `mmr-tortoise/homebrew-tap` リポジトリの存在を確認（`gh repo view mmr-tortoise/homebrew-tap`）、存在しない場合は作成（`gh repo create mmr-tortoise/homebrew-tap --public`）（**リリース時にユーザーが実施** — docs/RELEASE.md 参照）
 - [ ] T019 [US3] Homebrew Tap リポジトリに `Formula/` ディレクトリと README.md を作成してコミット・push（**リリース時にユーザーが実施** — docs/RELEASE.md 参照）
-- [ ] T020 [US3] GitHub Personal Access Token（PAT）を作成し、`shinji-kodama/homebrew-tap` への書き込み権限を付与（**ユーザー手動操作** — docs/RELEASE.md 参照）
+- [ ] T020 [US3] GitHub Personal Access Token（PAT）を作成し、`mmr-tortoise/homebrew-tap` への書き込み権限を付与（**ユーザー手動操作** — docs/RELEASE.md 参照）
 - [ ] T021 [US3] `worktree-container` リポジトリの GitHub Secrets に `HOMEBREW_TAP_TOKEN` を設定（`gh secret set HOMEBREW_TAP_TOKEN`）（**ユーザー手動操作** — docs/RELEASE.md 参照）
 - [x] T022 [US3] `.goreleaser.yml` の `brews` セクションの設定が正しいことを確認（`repository.owner`, `repository.name`, `directory: Formula`）
 
@@ -103,9 +103,9 @@
 ### Implementation for User Story 4
 
 - [x] T023 [US4] `packaging/winget/` ディレクトリを作成
-- [x] T024 [P] [US4] WinGet version マニフェストテンプレートを作成: `packaging/winget/shinji-kodama.worktree-container.yaml`（ManifestType: version、プレースホルダー: `{{VERSION}}`）
-- [x] T025 [P] [US4] WinGet installer マニフェストテンプレートを作成: `packaging/winget/shinji-kodama.worktree-container.installer.yaml`（InstallerType: zip、NestedInstallerType: portable、x64/arm64 対応、プレースホルダー: `{{VERSION}}`, `{{SHA256_X64}}`, `{{SHA256_ARM64}}`）
-- [x] T026 [P] [US4] WinGet defaultLocale マニフェストテンプレートを作成: `packaging/winget/shinji-kodama.worktree-container.locale.en-US.yaml`（Publisher, PackageName, License, ShortDescription, Tags を含む）
+- [x] T024 [P] [US4] WinGet version マニフェストテンプレートを作成: `packaging/winget/mmr-tortoise.worktree-container.yaml`（ManifestType: version、プレースホルダー: `{{VERSION}}`）
+- [x] T025 [P] [US4] WinGet installer マニフェストテンプレートを作成: `packaging/winget/mmr-tortoise.worktree-container.installer.yaml`（InstallerType: zip、NestedInstallerType: portable、x64/arm64 対応、プレースホルダー: `{{VERSION}}`, `{{SHA256_X64}}`, `{{SHA256_ARM64}}`）
+- [x] T026 [P] [US4] WinGet defaultLocale マニフェストテンプレートを作成: `packaging/winget/mmr-tortoise.worktree-container.locale.en-US.yaml`（Publisher, PackageName, License, ShortDescription, Tags を含む）
 - [x] T027 [US4] 3 つのマニフェストファイルが WinGet スキーマ v1.9.0 の必須フィールドをすべて含むことをレビュー
 
 **Checkpoint**: WinGet マニフェストテンプレートが準備完了。リリース後にプレースホルダーを置換して PR 提出可能な状態
@@ -173,9 +173,9 @@
 
 ```bash
 # WinGet マニフェスト 3 ファイルを並列作成:
-Task: "Create version manifest in packaging/winget/shinji-kodama.worktree-container.yaml"
-Task: "Create installer manifest in packaging/winget/shinji-kodama.worktree-container.installer.yaml"
-Task: "Create defaultLocale manifest in packaging/winget/shinji-kodama.worktree-container.locale.en-US.yaml"
+Task: "Create version manifest in packaging/winget/mmr-tortoise.worktree-container.yaml"
+Task: "Create installer manifest in packaging/winget/mmr-tortoise.worktree-container.installer.yaml"
+Task: "Create defaultLocale manifest in packaging/winget/mmr-tortoise.worktree-container.locale.en-US.yaml"
 ```
 
 ---

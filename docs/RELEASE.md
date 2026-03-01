@@ -19,17 +19,17 @@
 
 ### Homebrew Tap リポジトリの作成
 
-- [ ] `shinji-kodama/homebrew-tap` リポジトリを作成
+- [ ] `mmr-tortoise/homebrew-tap` リポジトリを作成
 
   ```bash
-  gh repo create shinji-kodama/homebrew-tap --public \
-    --description "Homebrew tap for shinji-kodama packages"
+  gh repo create mmr-tortoise/homebrew-tap --public \
+    --description "Homebrew tap for mmr-tortoise packages"
   ```
 
 - [ ] `Formula/` ディレクトリと README.md を作成してコミット・push
 
   ```bash
-  gh repo clone shinji-kodama/homebrew-tap
+  gh repo clone mmr-tortoise/homebrew-tap
   cd homebrew-tap
   mkdir Formula
   echo "# Homebrew Tap" > README.md
@@ -42,7 +42,7 @@
 
 - [ ] GitHub Settings > Developer settings > Personal access tokens > Fine-grained tokens で新しい PAT を作成
   - トークン名: `HOMEBREW_TAP_TOKEN`
-  - リポジトリアクセス: `shinji-kodama/homebrew-tap` のみ
+  - リポジトリアクセス: `mmr-tortoise/homebrew-tap` のみ
   - 権限: Contents（Read and write）
 
 ### GitHub Secrets の設定
@@ -50,7 +50,7 @@
 - [ ] `worktree-container` リポジトリの Secrets に `HOMEBREW_TAP_TOKEN` を設定
 
   ```bash
-  gh secret set HOMEBREW_TAP_TOKEN --repo shinji-kodama/worktree-container
+  gh secret set HOMEBREW_TAP_TOKEN --repo mmr-tortoise/worktree-container
   ```
 
 ---
@@ -133,16 +133,16 @@
 
 ### 5. Homebrew Formula の確認
 
-- [ ] `shinji-kodama/homebrew-tap` リポジトリに Formula が push されていることを確認
+- [ ] `mmr-tortoise/homebrew-tap` リポジトリに Formula が push されていることを確認
 
   ```bash
-  gh api repos/shinji-kodama/homebrew-tap/contents/Formula/worktree-container.rb
+  gh api repos/mmr-tortoise/homebrew-tap/contents/Formula/worktree-container.rb
   ```
 
 - [ ] Homebrew でインストールできることを確認（オプション）
 
   ```bash
-  brew install shinji-kodama/tap/worktree-container
+  brew install mmr-tortoise/tap/worktree-container
   worktree-container --version
   ```
 
@@ -179,9 +179,9 @@
 - [ ] フォークしたリポジトリにマニフェストファイルをコピー
 
   ```bash
-  # manifests/s/shinji-kodama/worktree-container/<VERSION>/ に配置
-  mkdir -p manifests/s/shinji-kodama/worktree-container/<VERSION>/
-  cp packaging/winget/*.yaml manifests/s/shinji-kodama/worktree-container/<VERSION>/
+  # manifests/s/mmr-tortoise/worktree-container/<VERSION>/ に配置
+  mkdir -p manifests/s/mmr-tortoise/worktree-container/<VERSION>/
+  cp packaging/winget/*.yaml manifests/s/mmr-tortoise/worktree-container/<VERSION>/
   ```
 
 - [ ] PR を提出して WinGet チームのレビューを待つ
@@ -204,7 +204,7 @@ goreleaser release --snapshot --clean --verbose
 
 - `HOMEBREW_TAP_TOKEN` の権限を確認
 - PAT の有効期限を確認
-- `shinji-kodama/homebrew-tap` リポジトリの存在を確認
+- `mmr-tortoise/homebrew-tap` リポジトリの存在を確認
 
 ### CI が Go バージョンエラーで失敗する場合
 

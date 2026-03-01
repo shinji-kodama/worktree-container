@@ -24,9 +24,9 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/shinji-kodama/worktree-container/internal/docker"
-	"github.com/shinji-kodama/worktree-container/internal/model"
-	"github.com/shinji-kodama/worktree-container/internal/worktree"
+	"github.com/mmr-tortoise/worktree-container/internal/docker"
+	"github.com/mmr-tortoise/worktree-container/internal/model"
+	"github.com/mmr-tortoise/worktree-container/internal/worktree"
 )
 
 // removeFlags holds the flag values for the remove command.

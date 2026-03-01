@@ -16,7 +16,7 @@ import (
 
 	"github.com/docker/docker/client"
 
-	"github.com/shinji-kodama/worktree-container/internal/model"
+	"github.com/mmr-tortoise/worktree-container/internal/model"
 )
 
 // defaultPingTimeout is the maximum duration to wait for a Docker daemon

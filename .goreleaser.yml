@@ -56,11 +56,11 @@ changelog:
 
 brews:
   - repository:
-      owner: shinji-kodama
+      owner: mmr-tortoise
       name: homebrew-tap
       token: "{{ .Env.HOMEBREW_TAP_TOKEN }}"
     directory: Formula
-    homepage: "https://github.com/shinji-kodama/worktree-container"
+    homepage: "https://github.com/mmr-tortoise/worktree-container"
     description: "Git worktree-aware Dev Container environment manager"
     license: "MIT"
     install: |

@@ -17,7 +17,7 @@
 - GitHub Release（タグ名 = バージョン）
 - 6 アーティファクト（darwin/linux × amd64/arm64 の tar.gz + windows_amd64 の zip）
 - `checksums.txt`
-- Homebrew Formula が `shinji-kodama/homebrew-tap` リポジトリの `Formula/` に自動 push
+- Homebrew Formula が `mmr-tortoise/homebrew-tap` リポジトリの `Formula/` に自動 push
 
 ## GoReleaser アーティファクト命名規則
 
@@ -43,13 +43,13 @@ worktree-container_<Version>_<OS>_<Arch>.<ext>
 
 ## Homebrew Formula 契約
 
-- **配置先**: `shinji-kodama/homebrew-tap` リポジトリ `Formula/worktree-container.rb`
-- **インストールコマンド**: `brew install shinji-kodama/tap/worktree-container`
+- **配置先**: `mmr-tortoise/homebrew-tap` リポジトリ `Formula/worktree-container.rb`
+- **インストールコマンド**: `brew install mmr-tortoise/tap/worktree-container`
 - **テスト**: `worktree-container --version` が成功すること
 
 ## WinGet マニフェスト契約
 
-- **PackageIdentifier**: `shinji-kodama.worktree-container`
+- **PackageIdentifier**: `mmr-tortoise.worktree-container`
 - **InstallerType**: `zip`（`NestedInstallerType: portable`）
 - **提出先**: `microsoft/winget-pkgs` リポジトリに PR
-- **インストールコマンド**: `winget install shinji-kodama.worktree-container`
+- **インストールコマンド**: `winget install mmr-tortoise.worktree-container`

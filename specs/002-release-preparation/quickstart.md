@@ -35,14 +35,14 @@ ls -la dist/
 
 ```bash
 # Tap リポジトリの作成（まだ存在しない場合）
-gh repo create shinji-kodama/homebrew-tap --public --description "Homebrew tap for shinji-kodama packages"
-gh repo clone shinji-kodama/homebrew-tap
+gh repo create mmr-tortoise/homebrew-tap --public --description "Homebrew tap for mmr-tortoise packages"
+gh repo clone mmr-tortoise/homebrew-tap
 cd homebrew-tap && mkdir Formula && git add . && git commit -m "chore: 初期化" && git push
 
 # HOMEBREW_TAP_TOKEN の設定
 # GitHub Settings > Developer settings > Personal access tokens で PAT を作成
 # worktree-container リポジトリの Settings > Secrets に HOMEBREW_TAP_TOKEN として登録
-gh secret set HOMEBREW_TAP_TOKEN --repo shinji-kodama/worktree-container
+gh secret set HOMEBREW_TAP_TOKEN --repo mmr-tortoise/worktree-container
 ```
 
 ## ステップ 4: WinGet マニフェスト準備
@@ -50,9 +50,9 @@ gh secret set HOMEBREW_TAP_TOKEN --repo shinji-kodama/worktree-container
 ```bash
 # テンプレートファイルの確認
 ls packaging/winget/
-# → shinji-kodama.worktree-container.yaml
-# → shinji-kodama.worktree-container.installer.yaml
-# → shinji-kodama.worktree-container.locale.en-US.yaml
+# → mmr-tortoise.worktree-container.yaml
+# → mmr-tortoise.worktree-container.installer.yaml
+# → mmr-tortoise.worktree-container.locale.en-US.yaml
 ```
 
 ## ステップ 5: リリース実行（タグの作成）

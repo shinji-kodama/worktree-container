@@ -10,7 +10,7 @@
 package main
 
 import (
-	"github.com/shinji-kodama/worktree-container/internal/cli"
+	"github.com/mmr-tortoise/worktree-container/internal/cli"
 )
 
 // version, commit, and date are set by GoReleaser at build time

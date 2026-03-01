@@ -22,7 +22,7 @@ import (
 	"fmt"
 	"sort"
 
-	"github.com/shinji-kodama/worktree-container/internal/model"
+	"github.com/mmr-tortoise/worktree-container/internal/model"
 	"github.com/tidwall/jsonc"
 	"gopkg.in/yaml.v3"
 )

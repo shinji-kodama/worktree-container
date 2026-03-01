@@ -54,4 +54,4 @@ GoReleaser が自動生成し、Tap リポジトリに push する。
 | Secret 名 | 用途 | 必要な権限 |
 |---|---|---|
 | `GITHUB_TOKEN` | GitHub Release 作成 | 自動提供（`contents: write`） |
-| `HOMEBREW_TAP_TOKEN` | Homebrew Tap への Formula push | `shinji-kodama/homebrew-tap` への書き込み |
+| `HOMEBREW_TAP_TOKEN` | Homebrew Tap への Formula push | `mmr-tortoise/homebrew-tap` への書き込み |
