@@ -129,6 +129,13 @@ func (p ConfigPattern) IsCompose() bool {
 	return p == PatternComposeSingle || p == PatternComposeMulti
 }
 
+// RequiresDocker returns true if the pattern requires Docker to manage
+// containers. PatternNone environments have no containers, so Docker
+// is not needed. All other patterns (A/B/C/D) require Docker.
+func (p ConfigPattern) RequiresDocker() bool {
+	return p != PatternNone
+}
+
 // ParseConfigPattern converts a string to a ConfigPattern.
 // Returns an error if the string does not match any valid pattern.
 func ParseConfigPattern(s string) (ConfigPattern, error) {

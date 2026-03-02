@@ -110,6 +110,16 @@ func TestConfigPattern_IsCompose(t *testing.T) {
 	assert.False(t, PatternNone.IsCompose())
 }
 
+// TestConfigPattern_RequiresDocker verifies that RequiresDocker returns true
+// for all patterns that need Docker (A/B/C/D) and false for PatternNone.
+func TestConfigPattern_RequiresDocker(t *testing.T) {
+	assert.True(t, PatternImage.RequiresDocker())
+	assert.True(t, PatternDockerfile.RequiresDocker())
+	assert.True(t, PatternComposeSingle.RequiresDocker())
+	assert.True(t, PatternComposeMulti.RequiresDocker())
+	assert.False(t, PatternNone.RequiresDocker())
+}
+
 // TestParseConfigPattern verifies string-to-pattern conversion.
 func TestParseConfigPattern(t *testing.T) {
 	tests := []struct {

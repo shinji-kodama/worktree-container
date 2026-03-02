@@ -112,7 +112,7 @@ func runRemove(ctx context.Context, envName string, flags *removeFlags) error {
 	// Step 4: Remove Docker containers and resources (skip for PatternNone).
 	// PatternNone environments have no containers to remove — only the
 	// Git worktree cleanup in Step 5 is needed.
-	if env.ConfigPattern != model.PatternNone {
+	if env.ConfigPattern.RequiresDocker() {
 		// Guard against nil Docker client for non-None patterns.
 		// If Docker is not available but the environment requires containers,
 		// return a clear error instead of proceeding to panic on Docker SDK calls.
