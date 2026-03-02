@@ -466,3 +466,49 @@ func TestParsePorcelainOutputEmpty(t *testing.T) {
 	result := parsePorcelainOutput("")
 	assert.Empty(t, result, "empty input should produce empty result")
 }
+
+// TestListPaths verifies that ListPaths returns the filesystem paths of all
+// non-bare worktrees, including the main repository and any additional
+// worktrees created via Add().
+func TestListPaths(t *testing.T) {
+	repoPath := setupTestRepo(t)
+	m := NewManager()
+
+	// Create two additional worktrees.
+	wt1 := filepath.Join(t.TempDir(), "wt-paths-1")
+	wt2 := filepath.Join(t.TempDir(), "wt-paths-2")
+
+	err := m.Add(repoPath, "paths-branch-1", wt1, "")
+	require.NoError(t, err)
+
+	err = m.Add(repoPath, "paths-branch-2", wt2, "")
+	require.NoError(t, err)
+
+	// ListPaths should return main repo + 2 worktrees = 3 paths.
+	paths, err := m.ListPaths(repoPath)
+	require.NoError(t, err)
+	assert.Len(t, paths, 3, "should return main repo + 2 worktree paths")
+
+	// Resolve symlinks for comparison (macOS /var → /private/var).
+	resolvedRepo, _ := filepath.EvalSymlinks(repoPath)
+	resolvedWT1, _ := filepath.EvalSymlinks(wt1)
+	resolvedWT2, _ := filepath.EvalSymlinks(wt2)
+
+	assert.Contains(t, paths, resolvedRepo, "should include main repo path")
+	assert.Contains(t, paths, resolvedWT1, "should include worktree 1 path")
+	assert.Contains(t, paths, resolvedWT2, "should include worktree 2 path")
+}
+
+// TestListPaths_MainOnly verifies that ListPaths returns only the main
+// repository path when no additional worktrees have been created.
+func TestListPaths_MainOnly(t *testing.T) {
+	repoPath := setupTestRepo(t)
+	m := NewManager()
+
+	paths, err := m.ListPaths(repoPath)
+	require.NoError(t, err)
+	assert.Len(t, paths, 1, "should return only the main repo path")
+
+	resolvedRepo, _ := filepath.EvalSymlinks(repoPath)
+	assert.Equal(t, resolvedRepo, paths[0], "the single path should be the main repo")
+}

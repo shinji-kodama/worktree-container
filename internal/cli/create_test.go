@@ -206,3 +206,125 @@ func TestLateDevcontainerAddition(t *testing.T) {
 	assert.Equal(t, model.PatternImage, readMarker.ConfigPattern,
 		"marker should be updated to 'image' after late devcontainer addition")
 }
+
+// TestFindEnvironmentFromMarker_Found verifies that findEnvironmentFromMarker
+// discovers an environment by name from marker files in the repository's
+// worktrees. This test uses os.Chdir to set the working directory inside the
+// repo, so it must NOT use t.Parallel().
+func TestFindEnvironmentFromMarker_Found(t *testing.T) {
+	repoPath := setupTestRepo(t)
+	wm := worktree.NewManager()
+
+	// Create a worktree with a marker file.
+	branchName := "feature-find-marker"
+	envName := "feature-find-marker"
+	worktreePath := filepath.Join(t.TempDir(), "wt-find-marker")
+
+	err := wm.Add(repoPath, branchName, worktreePath, "")
+	require.NoError(t, err)
+
+	marker := worktree.MarkerFile{
+		ManagedBy:      "worktree-container",
+		Name:           envName,
+		Branch:         branchName,
+		SourceRepoPath: repoPath,
+		ConfigPattern:  model.PatternImage,
+		CreatedAt:      "2026-03-02T12:00:00Z",
+	}
+	err = worktree.WriteMarkerFile(worktreePath, marker)
+	require.NoError(t, err)
+
+	// Save and restore cwd to avoid affecting other tests.
+	origDir, err := os.Getwd()
+	require.NoError(t, err)
+	defer func() { _ = os.Chdir(origDir) }()
+
+	err = os.Chdir(repoPath)
+	require.NoError(t, err)
+
+	// findEnvironmentFromMarker should find the environment.
+	env, findErr := findEnvironmentFromMarker(envName)
+	require.NoError(t, findErr)
+	require.NotNil(t, env, "should find environment by name from marker")
+
+	assert.Equal(t, envName, env.Name)
+	assert.Equal(t, branchName, env.Branch)
+	assert.Equal(t, model.PatternImage, env.ConfigPattern)
+}
+
+// TestFindEnvironmentFromMarker_NotFound verifies that findEnvironmentFromMarker
+// returns nil, nil when the specified environment name does not match any marker.
+func TestFindEnvironmentFromMarker_NotFound(t *testing.T) {
+	repoPath := setupTestRepo(t)
+
+	origDir, err := os.Getwd()
+	require.NoError(t, err)
+	defer func() { _ = os.Chdir(origDir) }()
+
+	err = os.Chdir(repoPath)
+	require.NoError(t, err)
+
+	env, findErr := findEnvironmentFromMarker("nonexistent-env")
+	assert.NoError(t, findErr)
+	assert.Nil(t, env, "should return nil for non-existent environment")
+}
+
+// TestFindEnvironmentFromMarker_StatusByPattern verifies that the status
+// heuristic in findEnvironmentFromMarker correctly maps:
+// - PatternNone → StatusNoContainer
+// - PatternImage → StatusStopped
+func TestFindEnvironmentFromMarker_StatusByPattern(t *testing.T) {
+	repoPath := setupTestRepo(t)
+	wm := worktree.NewManager()
+
+	// Create two worktrees with different patterns.
+	wtNone := filepath.Join(t.TempDir(), "wt-status-none")
+	wtImage := filepath.Join(t.TempDir(), "wt-status-image")
+
+	err := wm.Add(repoPath, "status-none", wtNone, "")
+	require.NoError(t, err)
+	err = wm.Add(repoPath, "status-image", wtImage, "")
+	require.NoError(t, err)
+
+	// Write markers.
+	err = worktree.WriteMarkerFile(wtNone, worktree.MarkerFile{
+		ManagedBy:      "worktree-container",
+		Name:           "status-none",
+		Branch:         "status-none",
+		SourceRepoPath: repoPath,
+		ConfigPattern:  model.PatternNone,
+		CreatedAt:      "2026-03-02T12:00:00Z",
+	})
+	require.NoError(t, err)
+
+	err = worktree.WriteMarkerFile(wtImage, worktree.MarkerFile{
+		ManagedBy:      "worktree-container",
+		Name:           "status-image",
+		Branch:         "status-image",
+		SourceRepoPath: repoPath,
+		ConfigPattern:  model.PatternImage,
+		CreatedAt:      "2026-03-02T12:00:00Z",
+	})
+	require.NoError(t, err)
+
+	origDir, err := os.Getwd()
+	require.NoError(t, err)
+	defer func() { _ = os.Chdir(origDir) }()
+
+	err = os.Chdir(repoPath)
+	require.NoError(t, err)
+
+	// PatternNone → StatusNoContainer
+	envNone, err := findEnvironmentFromMarker("status-none")
+	require.NoError(t, err)
+	require.NotNil(t, envNone)
+	assert.Equal(t, model.StatusNoContainer, envNone.Status,
+		"PatternNone should map to StatusNoContainer")
+
+	// PatternImage → StatusStopped
+	envImage, err := findEnvironmentFromMarker("status-image")
+	require.NoError(t, err)
+	require.NotNil(t, envImage)
+	assert.Equal(t, model.StatusStopped, envImage.Status,
+		"PatternImage should map to StatusStopped (best guess without Docker)")
+}
