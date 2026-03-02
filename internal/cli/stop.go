@@ -198,20 +198,20 @@ func findEnvironmentFromMarker(envName string) (*model.WorktreeEnv, error) {
 
 	cwd, err := os.Getwd()
 	if err != nil {
-		VerboseLog("Warning: could not get current directory: %v", err)
-		return nil, nil
+		return nil, fmt.Errorf("could not get current directory: %w", err)
 	}
 
 	repoRoot, err := wm.GetRepoRoot(cwd)
 	if err != nil {
+		// Not being inside a Git repository is a legitimate scenario
+		// (e.g., running from $HOME). Return nil, nil to indicate "not found".
 		VerboseLog("Warning: not inside a Git repository: %v", err)
 		return nil, nil
 	}
 
 	wtPaths, err := wm.ListPaths(repoRoot)
 	if err != nil {
-		VerboseLog("Warning: could not list worktrees: %v", err)
-		return nil, nil
+		return nil, fmt.Errorf("could not list worktrees: %w", err)
 	}
 
 	for _, wtPath := range wtPaths {
@@ -225,7 +225,10 @@ func findEnvironmentFromMarker(envName string) (*model.WorktreeEnv, error) {
 		}
 
 		// Found a matching marker — build a WorktreeEnv from it.
-		createdAt, _ := time.Parse(time.RFC3339, marker.CreatedAt)
+		createdAt, parseErr := time.Parse(time.RFC3339, marker.CreatedAt)
+		if parseErr != nil {
+			VerboseLog("Warning: could not parse createdAt %q in marker at %s: %v", marker.CreatedAt, wtPath, parseErr)
+		}
 
 		// Use config pattern from marker directly (typed as model.ConfigPattern).
 		// Default to PatternNone if the stored value is invalid.
@@ -234,7 +237,12 @@ func findEnvironmentFromMarker(envName string) (*model.WorktreeEnv, error) {
 			configPattern = model.PatternNone
 		}
 
-		// Determine status based on config pattern.
+		// Determine status heuristically based on config pattern.
+		// Without Docker, we cannot know the actual container state, so:
+		// - PatternNone → StatusNoContainer (no containers exist)
+		// - Any other pattern → StatusStopped (best guess; containers may
+		//   actually be running or removed, but "stopped" is the safest
+		//   assumption for marker-only lookup without Docker).
 		status := model.StatusNoContainer
 		if configPattern != model.PatternNone {
 			status = model.StatusStopped
