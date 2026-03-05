@@ -1,4 +1,4 @@
-# golangci-lint configuration for worktree-container
+# golangci-lint configuration for loam
 # Documentation: https://golangci-lint.run/docs/configuration/
 version: "2"
 

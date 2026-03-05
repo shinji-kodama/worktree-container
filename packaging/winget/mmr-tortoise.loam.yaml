@@ -1,13 +1,13 @@
 # yaml-language-server: $schema=https://aka.ms/winget-manifest.version.1.9.0.schema.json
 # ─────────────────────────────────────────────────────────────────────
-# WinGet Version Manifest for worktree-container
+# WinGet Version Manifest for loam
 #
 # Directory in winget-pkgs:
-#   manifests/s/mmr-tortoise/worktree-container/{{VERSION}}/
+#   manifests/s/mmr-tortoise/loam/{{VERSION}}/
 #
-# File name: mmr-tortoise.worktree-container.yaml
+# File name: mmr-tortoise.loam.yaml
 # ─────────────────────────────────────────────────────────────────────
-PackageIdentifier: mmr-tortoise.worktree-container
+PackageIdentifier: mmr-tortoise.loam
 PackageVersion: "{{VERSION}}"
 DefaultLocale: en-US
 ManifestType: version

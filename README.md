@@ -1,145 +1,145 @@
-# Worktree Container
+# Loam
 
-[![Go](https://img.shields.io/badge/Go-%3E%3D%201.22-00ADD8?logo=go)](https://go.dev/)
+*Fertile soil for your worktrees* 🌱
+
+[![Go](https://img.shields.io/badge/Go-1.25-00ADD8?logo=go)](https://go.dev/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-Git ワークツリーごとに独立した Dev Container 環境を自動構築する CLI ツールです。
+A CLI tool that automatically builds isolated Dev Container environments for each Git worktree.
 
-複数のブランチで同時に開発を行う際、ポート衝突やコンテナの競合を気にすることなく、
-各ワークツリーに完全に分離された Dev Container 環境を1コマンドで作成できます。
-コーディングエージェント（Claude Code 等）に別ブランチの作業を任せながら、
-メインブランチの開発環境を中断せずに使い続けることができます。
+When developing across multiple branches simultaneously, you can create a fully isolated Dev Container environment for each worktree with a single command -- no need to worry about port conflicts or container collisions.
+Delegate work on other branches to coding agents (such as Claude Code) while continuing to use your main branch's development environment without interruption.
 
-## 特徴
+## Features
 
-- **ポート衝突ゼロ保証** -- 最大 10 環境の同時稼働でもポート衝突が発生しません。ポートシフトアルゴリズムにより、すべてのポート割り当てを自動処理します
-- **4パターンの devcontainer.json 対応** -- image 指定、Dockerfile ビルド、Compose 単一サービス、Compose 複数サービスのすべてに対応します
-- **Docker ラベルベース状態管理** -- 外部の状態ファイルは不要です。すべてのメタデータは Docker コンテナラベルから動的に検出します
-- **複数ツール対応** -- VS Code Dev Container、Dev Container CLI、DevPod のいずれからでも接続可能です
-- **クロスプラットフォーム** -- macOS、Linux、Windows をサポートします
-- **元の設定を破壊しない** -- 元プロジェクトの devcontainer.json は読み取り専用。ワークツリー側にコピーを生成して改変します
+- **Zero Port Collision Guarantee** -- No port conflicts even with up to 10 environments running simultaneously. The port-shift algorithm handles all port assignments automatically
+- **All 4 devcontainer.json Patterns Supported** -- Works with image references, Dockerfile builds, single-service Compose, and multi-service Compose configurations
+- **Dual-Source State Management** -- Docker container labels store runtime metadata, while lightweight `.loam` marker files in each worktree enable fast environment discovery without querying Docker
+- **Multiple Tool Support** -- Connect from VS Code Dev Containers, Dev Container CLI, or DevPod
+- **Cross-Platform** -- Supports macOS, Linux, and Windows
+- **Non-Destructive to Original Config** -- The original project's devcontainer.json is read-only. A copy is generated in the worktree and modified there
 
-## インストール
+## Installation
 
-### Homebrew（macOS / Linux）
+### Homebrew (macOS / Linux)
 
 ```bash
-brew install mmr-tortoise/tap/worktree-container
+brew install mmr-tortoise/tap/loam
 ```
 
 ### go install
 
 ```bash
-go install github.com/mmr-tortoise/worktree-container/cmd/worktree-container@latest
+go install github.com/mmr-tortoise/loam/cmd/loam@latest
 ```
 
-### ソースからビルド
+### Build from Source
 
 ```bash
-git clone https://github.com/mmr-tortoise/worktree-container.git
-cd worktree-container
-go build -o worktree-container ./cmd/worktree-container
+git clone https://github.com/mmr-tortoise/loam.git
+cd loam
+go build -o loam ./cmd/loam
 ```
 
-### WinGet（Windows）
+### WinGet (Windows)
 
 ```powershell
-winget install mmr-tortoise.worktree-container
+winget install mmr-tortoise.loam
 ```
 
-## 前提条件
+## Prerequisites
 
-- Docker Engine または Docker Desktop が稼働中であること
+- Docker Engine or Docker Desktop must be running
 - Git >= 2.15
-- 対象プロジェクトに `.devcontainer/devcontainer.json` が存在すること
+- The target project must contain a `.devcontainer/devcontainer.json`
 
-## クイックスタート
+## Quick Start
 
-### 1. ワークツリー環境を作成する
+### 1. Create a Worktree Environment
 
-devcontainer.json を持つプロジェクトのルートで実行します。
-
-```bash
-# 新しいブランチでワークツリー環境を作成
-worktree-container create feature-auth
-
-# 既存のブランチをベースにワークツリー環境を作成
-worktree-container create --base main bugfix-login
-
-# 作成先パスを指定
-worktree-container create --path ~/dev/feature-auth feature-auth
-```
-
-### 2. ワークツリー環境の一覧を確認する
+Run from the root of a project that has a devcontainer.json.
 
 ```bash
-# テキスト表示
-worktree-container list
+# Create a worktree environment on a new branch
+loam create feature-auth
 
-# JSON 形式
-worktree-container list --json
+# Create a worktree environment based on an existing branch
+loam create --base main bugfix-login
 
-# 稼働中の環境のみ表示
-worktree-container list --status running
+# Specify the destination path
+loam create --path ~/dev/feature-auth feature-auth
 ```
 
-### 3. ワークツリー環境を停止・再起動する
+### 2. List Worktree Environments
 
 ```bash
-# 停止
-worktree-container stop feature-auth
+# Text output
+loam list
 
-# 再起動
-worktree-container start feature-auth
+# JSON format
+loam list --json
+
+# Show only running environments
+loam list --status running
 ```
 
-### 4. ワークツリー環境を削除する
+### 3. Stop and Restart Worktree Environments
 
 ```bash
-# 対話的に確認して削除
-worktree-container remove feature-auth
+# Stop
+loam stop feature-auth
 
-# 確認なしで削除
-worktree-container remove --force feature-auth
-
-# コンテナのみ削除し、Git ワークツリーは保持
-worktree-container remove --keep-worktree feature-auth
+# Restart
+loam start feature-auth
 ```
 
-## コマンドリファレンス
+### 4. Remove a Worktree Environment
+
+```bash
+# Remove with interactive confirmation
+loam remove feature-auth
+
+# Remove without confirmation
+loam remove --force feature-auth
+
+# Remove containers only, keeping the Git worktree
+loam remove --keep-worktree feature-auth
+```
+
+## Command Reference
 
 ```
-worktree-container <command> [flags]
+loam <command> [flags]
 
 Commands:
-  create    新しいワークツリー環境を作成・起動する
-  list      ワークツリー環境の一覧を表示する
-  start     停止中のワークツリー環境を再起動する
-  stop      稼働中のワークツリー環境を停止する
-  remove    ワークツリー環境を削除する
+  create    Create and start a new worktree environment
+  list      List worktree environments
+  start     Restart a stopped worktree environment
+  stop      Stop a running worktree environment
+  remove    Remove a worktree environment
 
 Global Flags:
-  --json            JSON 形式で出力する
-  --verbose, -v     詳細なログを出力する
-  --help, -h        ヘルプを表示する
-  --version         バージョンを表示する
+  --json            Output in JSON format
+  --verbose, -v     Enable verbose logging
+  --help, -h        Show help
+  --version         Show version
 ```
 
-### `worktree-container create`
+### `loam create`
 
-新しい Git ワークツリーを作成し、そのワークツリー専用の Dev Container 環境を起動します。
+Creates a new Git worktree and launches a dedicated Dev Container environment for it.
 
 ```
-worktree-container create <branch-name> [flags]
+loam create <branch-name> [flags]
 
 Flags:
-  --base <ref>       ワークツリーのベースとなるコミット/ブランチ（デフォルト: HEAD）
-  --path <dir>       ワークツリーの作成先パス（デフォルト: ../<repo>-<branch-name>）
-  --name <name>      ワークツリー環境の識別名（デフォルト: <branch-name>）
-  --no-start         ワークツリー作成のみ行い、コンテナは起動しない
+  --base <ref>       Base commit/branch for the worktree (default: HEAD)
+  --path <dir>       Destination path for the worktree (default: ../<repo>-<branch-name>)
+  --name <name>      Identifier for the worktree environment (default: <branch-name>)
+  --no-start         Create the worktree only without starting containers
 ```
 
-**出力例（テキスト）:**
+**Example Output (Text):**
 
 ```
 Created worktree environment "feature-auth"
@@ -153,7 +153,7 @@ Created worktree environment "feature-auth"
     redis   localhost:16379         (container: 6379)
 ```
 
-**出力例（JSON）:**
+**Example Output (JSON):**
 
 ```json
 {
@@ -170,18 +170,18 @@ Created worktree environment "feature-auth"
 }
 ```
 
-### `worktree-container list`
+### `loam list`
 
-全ワークツリー環境の一覧を表示します。
+Lists all worktree environments.
 
 ```
-worktree-container list [flags]
+loam list [flags]
 
 Flags:
-  --status <status>  フィルタ: running / stopped / orphaned / all（デフォルト: all）
+  --status <status>  Filter: running / stopped / orphaned / all (default: all)
 ```
 
-**出力例:**
+**Example Output:**
 
 ```
 NAME           BRANCH          STATUS    SERVICES  PORTS
@@ -190,79 +190,79 @@ bugfix-login   bugfix/login    stopped   1         -
 old-branch     old/branch      orphaned  0         -
 ```
 
-### `worktree-container stop`
+### `loam stop`
 
-稼働中のワークツリー環境のコンテナを停止します。
-
-```
-worktree-container stop <name>
-```
-
-### `worktree-container start`
-
-停止中のワークツリー環境のコンテナを再起動します。
+Stops the containers of a running worktree environment.
 
 ```
-worktree-container start <name>
+loam stop <name>
 ```
 
-### `worktree-container remove`
+### `loam start`
 
-ワークツリー環境を削除します。コンテナ、ネットワーク、ワークツリー専用ボリュームを削除し、
-オプションで Git ワークツリーも削除します。
+Restarts the containers of a stopped worktree environment.
 
 ```
-worktree-container remove <name> [flags]
+loam start <name>
+```
+
+### `loam remove`
+
+Removes a worktree environment. Deletes containers, networks, and worktree-dedicated volumes,
+and optionally removes the Git worktree as well.
+
+```
+loam remove <name> [flags]
 
 Flags:
-  --force, -f         確認なしで削除する
-  --keep-worktree     Git ワークツリーは削除せず保持する
+  --force, -f         Remove without confirmation
+  --keep-worktree     Keep the Git worktree instead of removing it
 ```
 
-### 終了コード
+### Exit Codes
 
-| コード | 意味 |
-|--------|------|
-| 0 | 成功 |
-| 1 | 一般エラー |
-| 2 | devcontainer.json が見つからない |
-| 3 | Docker が起動していない |
-| 4 | ポート割り当て失敗 |
-| 5 | Git 操作エラー |
-| 6 | 指定された環境が見つからない |
-| 7 | ユーザーがキャンセルした |
+| Code | Meaning |
+|------|---------|
+| 0 | Success |
+| 1 | General error |
+| 2 | devcontainer.json not found |
+| 3 | Docker is not running |
+| 4 | Port allocation failure |
+| 5 | Git operation error |
+| 6 | Specified environment not found |
+| 7 | Cancelled by user |
 
-## ポート管理
+## Port Management
 
-Worktree Container はポートシフトアルゴリズムにより、各ワークツリー環境のホスト側ポートを自動的に割り当てます。
+Loam automatically assigns host-side ports for each worktree environment using a port-shift algorithm.
 
-### ポートシフトアルゴリズム
+### Port-Shift Algorithm
 
 ```
 shiftedPort = originalPort + (worktreeIndex * 10000)
 ```
 
-| 環境 | ベースポート 3000 | ベースポート 5432 | ベースポート 6379 |
-|------|-------------------|-------------------|-------------------|
-| 元環境（index 0） | 3000 | 5432 | 6379 |
-| ワークツリー 1 | 13000 | 15432 | 16379 |
-| ワークツリー 2 | 23000 | 25432 | 26379 |
-| ワークツリー 3 | 33000 | 35432 | 36379 |
+| Environment | Base Port 3000 | Base Port 5432 | Base Port 6379 |
+|-------------|----------------|----------------|----------------|
+| Original (index 0) | 3000 | 5432 | 6379 |
+| Worktree 1 | 13000 | 15432 | 16379 |
+| Worktree 2 | 23000 | 25432 | 26379 |
+| Worktree 3 | 33000 | 35432 | 36379 |
 
-### 衝突回避
+### Collision Avoidance
 
-1. シフト後のポートが 65535 を超える場合、空きポートを動的に探索します
-2. 他のプロセスが使用中のポートは `net.Listen()` で検出し、自動的に回避します
-3. 他のワークツリー環境が使用中のポートは Docker ラベルから検出します
+1. If a shifted port exceeds 65535, an available port is dynamically discovered
+2. Ports in use by other processes are detected via `net.Listen()` and automatically avoided
+3. Ports in use by other worktree environments are detected from Docker labels
 
-ユーザーがポート番号を手動で指定する必要はありません。
-`worktree-container list` コマンドで各環境のアクセス先を確認できます。
+Users never need to manually specify port numbers.
+Use `loam list` to check the access endpoints for each environment.
 
-## サポートする devcontainer.json パターン
+## Supported devcontainer.json Patterns
 
-### パターン A: image 指定
+### Pattern A: Image Reference
 
-`image` フィールドで Docker イメージを直接指定するパターンです。
+Specifies a Docker image directly using the `image` field.
 
 ```json
 {
@@ -272,9 +272,9 @@ shiftedPort = originalPort + (worktreeIndex * 10000)
 }
 ```
 
-### パターン B: Dockerfile ビルド
+### Pattern B: Dockerfile Build
 
-`build` フィールドで Dockerfile からビルドするパターンです。
+Builds from a Dockerfile using the `build` field.
 
 ```json
 {
@@ -287,9 +287,9 @@ shiftedPort = originalPort + (worktreeIndex * 10000)
 }
 ```
 
-### パターン C: Docker Compose 単一サービス
+### Pattern C: Docker Compose Single Service
 
-`dockerComposeFile` フィールドで Docker Compose を使用し、サービスが1つのパターンです。
+Uses Docker Compose via the `dockerComposeFile` field with a single service.
 
 ```json
 {
@@ -300,10 +300,10 @@ shiftedPort = originalPort + (worktreeIndex * 10000)
 }
 ```
 
-### パターン D: Docker Compose 複数サービス
+### Pattern D: Docker Compose Multiple Services
 
-`dockerComposeFile` フィールドで Docker Compose を使用し、サービスが2つ以上のパターンです。
-アプリ + DB + キャッシュなどの構成に対応します。
+Uses Docker Compose via the `dockerComposeFile` field with two or more services.
+Supports configurations such as app + database + cache.
 
 ```json
 {
@@ -331,14 +331,14 @@ services:
       - "6379:6379"
 ```
 
-## 対応ツール
+## Compatible Tools
 
-ワークツリー環境を作成した後、以下のいずれの方法でもコンテナに接続できます。
+After creating a worktree environment, you can connect to the container using any of the following methods.
 
 ### VS Code
 
-1. ワークツリーフォルダを VS Code で開く
-2. コマンドパレット → 「Reopen in Container」
+1. Open the worktree folder in VS Code
+2. Command Palette -> "Reopen in Container"
 
 ### Dev Container CLI
 
@@ -353,48 +353,48 @@ devcontainer exec --workspace-folder /path/to/worktree bash
 devpod up /path/to/worktree
 ```
 
-## 開発
+## Development
 
-### 前提条件
+### Prerequisites
 
-- Go >= 1.22
-- Docker Engine または Docker Desktop
+- Go 1.25
+- Docker Engine or Docker Desktop
 - Git >= 2.15
 
-### ビルド
+### Build
 
 ```bash
-go build -o worktree-container ./cmd/worktree-container
+go build -o loam ./cmd/loam
 ```
 
-### テスト
+### Test
 
 ```bash
-# ユニットテスト
+# Unit tests
 go test ./internal/...
 
-# 統合テスト（Docker 必要）
+# Integration tests (requires Docker)
 go test -tags=integration ./tests/integration/...
 
-# 全テスト
+# All tests
 go test ./...
 ```
 
-### リント
+### Lint
 
 ```bash
 golangci-lint run
 ```
 
-### リリース（GoReleaser）
+### Release (GoReleaser)
 
 ```bash
 goreleaser release --snapshot --clean
 ```
 
-詳しい開発手順は [CONTRIBUTING.md](./CONTRIBUTING.md) を参照してください。
+For detailed development instructions, see [CONTRIBUTING.md](./CONTRIBUTING.md).
 
-## ライセンス
+## License
 
 [MIT License](./LICENSE)
 

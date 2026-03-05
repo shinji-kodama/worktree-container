@@ -1,4 +1,4 @@
-// Package cli — create.go implements the "worktree-container create" command.
+// Package cli — create.go implements the "loam create" command.
 //
 // The create command is the primary user-facing operation (US1 / MVP).
 // It orchestrates the full workflow of creating a Git worktree and launching
@@ -29,11 +29,11 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/mmr-tortoise/worktree-container/internal/devcontainer"
-	"github.com/mmr-tortoise/worktree-container/internal/docker"
-	"github.com/mmr-tortoise/worktree-container/internal/model"
-	"github.com/mmr-tortoise/worktree-container/internal/port"
-	"github.com/mmr-tortoise/worktree-container/internal/worktree"
+	"github.com/mmr-tortoise/loam/internal/devcontainer"
+	"github.com/mmr-tortoise/loam/internal/docker"
+	"github.com/mmr-tortoise/loam/internal/model"
+	"github.com/mmr-tortoise/loam/internal/port"
+	"github.com/mmr-tortoise/loam/internal/worktree"
 )
 
 // createFlags holds the flag values for the create command.
@@ -62,10 +62,10 @@ The command automatically:
   - Starts the Dev Container with shifted ports
 
 Examples:
-  worktree-container create feature-auth
-  worktree-container create --base main bugfix-login
-  worktree-container create --path ~/dev/feature-auth feature-auth
-  worktree-container create --no-start feature-auth`,
+  loam create feature-auth
+  loam create --base main bugfix-login
+  loam create --path ~/dev/feature-auth feature-auth
+  loam create --no-start feature-auth`,
 
 		// Args validates that exactly one positional argument (branch name) is provided.
 		Args: cobra.ExactArgs(1),
@@ -141,7 +141,7 @@ func runCreate(ctx context.Context, branchName string, flags *createFlags) error
 	// to the actual pattern after devcontainer.json detection and processing.
 	// This ensures the worktree is tracked even if the process is interrupted.
 	marker := worktree.MarkerFile{
-		ManagedBy:      "worktree-container",
+		ManagedBy:      "loam",
 		Name:           envName,
 		Branch:         branchName,
 		SourceRepoPath: repoRoot,

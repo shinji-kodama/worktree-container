@@ -19,12 +19,12 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/mmr-tortoise/worktree-container/internal/model"
+	"github.com/mmr-tortoise/loam/internal/model"
 	"github.com/tidwall/jsonc"
 )
 
 // RawDevContainer represents the raw JSON structure of a devcontainer.json file.
-// Only the fields relevant to worktree-container are included; other fields
+// Only the fields relevant to loam are included; other fields
 // are silently ignored during parsing.
 //
 // Several fields use interface{} types because the devcontainer.json spec allows

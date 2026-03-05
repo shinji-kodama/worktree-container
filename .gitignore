@@ -1,5 +1,5 @@
 # Binaries
-/worktree-container
+/loam
 *.exe
 *.exe~
 *.dll
@@ -40,3 +40,9 @@ Thumbs.db
 
 # Debug
 __debug_bin*
+
+# AI tooling (not included in OSS release)
+.claude/
+CLAUDE.md
+.specify/
+specs/

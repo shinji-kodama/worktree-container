@@ -1,4 +1,4 @@
-// Package cli implements the cobra-based CLI commands for worktree-container.
+// Package cli implements the cobra-based CLI commands for loam.
 //
 // Each subcommand (create, list, start, stop, remove) is defined in its own
 // file within this package. This file defines the root command that serves as
@@ -12,7 +12,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/mmr-tortoise/worktree-container/internal/model"
+	"github.com/mmr-tortoise/loam/internal/model"
 )
 
 // Global flag variables shared across all subcommands.
@@ -51,9 +51,9 @@ var (
 func NewRootCommand() *cobra.Command {
 	rootCmd := &cobra.Command{
 		// Use is the one-line usage pattern shown in help output.
-		Use:   "worktree-container",
+		Use:   "loam",
 		Short: "Git worktree-aware Dev Container environment manager",
-		Long: `worktree-container automatically creates isolated Dev Container environments
+		Long: `loam automatically creates isolated Dev Container environments
 for each Git worktree, with automatic port management to prevent conflicts.
 
 Each worktree gets its own set of containers with shifted ports, ensuring

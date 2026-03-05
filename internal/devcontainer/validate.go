@@ -95,7 +95,7 @@ func ValidateConfig(raw *RawDevContainer) []ValidationError {
 
 // ValidateGeneratedConfig validates a generated (rewritten) devcontainer.json
 // file by parsing it and running ValidateConfig, plus additional checks
-// specific to the worktree-container modifications.
+// specific to the loam modifications.
 func ValidateGeneratedConfig(jsonData []byte) []ValidationError {
 	var raw RawDevContainer
 	if err := json.Unmarshal(jsonData, &raw); err != nil {

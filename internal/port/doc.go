@@ -1,5 +1,5 @@
 // Package port implements port scanning and allocation for the
-// worktree-container CLI.
+// loam CLI.
 //
 // The core algorithm is offset-based port shifting:
 //

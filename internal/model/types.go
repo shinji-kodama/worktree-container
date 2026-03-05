@@ -1,4 +1,4 @@
-// Package model defines the domain types for the worktree-container CLI.
+// Package model defines the domain types for the loam CLI.
 //
 // All entities in this package represent the core data structures described
 // in the data-model.md specification. These types are used throughout the
@@ -6,7 +6,7 @@
 //
 // Key design decision: State is persisted via two complementary sources:
 // Docker container labels (FR-011) for live container metadata, and
-// marker files (.worktree-container) for worktree-level metadata.
+// marker files (.loam) for worktree-level metadata.
 // These types are reconstructed at runtime from one or both sources.
 package model
 
@@ -101,7 +101,7 @@ const (
 	PatternComposeMulti ConfigPattern = "compose-multi"
 
 	// PatternNone indicates that no devcontainer.json exists.
-	// The worktree is managed by worktree-container but has no container
+	// The worktree is managed by loam but has no container
 	// configuration. Containers can be added later by creating a devcontainer.json.
 	PatternNone ConfigPattern = "none"
 )
@@ -151,7 +151,7 @@ func ParseConfigPattern(s string) (ConfigPattern, error) {
 //
 // Fields are reconstructed at runtime from two sources: Docker container
 // labels (see Docker label schema in data-model.md) and marker files
-// (.worktree-container) placed in each managed worktree directory.
+// (.loam) placed in each managed worktree directory.
 // PatternNone environments rely solely on marker files.
 type WorktreeEnv struct {
 	// Name is the unique identifier for this worktree environment.
@@ -307,7 +307,7 @@ type ContainerInfo struct {
 	Status string `json:"status"`
 
 	// Labels is the full set of Docker labels on the container.
-	// Includes worktree-container management labels (worktree.* prefix).
+	// Includes loam management labels (loam.* prefix).
 	Labels map[string]string `json:"labels,omitempty"`
 }
 

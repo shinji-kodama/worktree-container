@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/mmr-tortoise/worktree-container/internal/model"
+	"github.com/mmr-tortoise/loam/internal/model"
 )
 
 // TestBuildLabels verifies that BuildLabels correctly converts a WorktreeEnv
@@ -42,9 +42,9 @@ func TestBuildLabels(t *testing.T) {
 	assert.Equal(t, "2026-02-28T10:00:00Z", labels[LabelCreatedAt])
 
 	// Assert: verify port allocation labels.
-	assert.Equal(t, "13000", labels["worktree.original-port.3000"],
+	assert.Equal(t, "13000", labels["loam.original-port.3000"],
 		"port 3000 should be mapped to host port 13000")
-	assert.Equal(t, "15432", labels["worktree.original-port.5432"],
+	assert.Equal(t, "15432", labels["loam.original-port.5432"],
 		"port 5432 should be mapped to host port 15432")
 
 	// Assert: verify total label count (7 static + 2 port = 9).
@@ -76,15 +76,15 @@ func TestBuildLabels_NoPorts(t *testing.T) {
 func TestParseLabels(t *testing.T) {
 	// Arrange: create a label map matching what BuildLabels would produce.
 	labels := map[string]string{
-		LabelManagedBy:                ManagedByValue,
-		LabelName:                     "feature-auth",
-		LabelBranch:                   "feature/auth",
-		LabelWorktreePath:             "/Users/user/repo-feature-auth",
-		LabelSourceRepo:               "/Users/user/repo",
-		LabelConfigPattern:            "compose-multi",
-		LabelCreatedAt:                "2026-02-28T10:00:00Z",
-		"worktree.original-port.3000": "13000",
-		"worktree.original-port.5432": "15432",
+		LabelManagedBy:            ManagedByValue,
+		LabelName:                 "feature-auth",
+		LabelBranch:               "feature/auth",
+		LabelWorktreePath:         "/Users/user/repo-feature-auth",
+		LabelSourceRepo:           "/Users/user/repo",
+		LabelConfigPattern:        "compose-multi",
+		LabelCreatedAt:            "2026-02-28T10:00:00Z",
+		"loam.original-port.3000": "13000",
+		"loam.original-port.5432": "15432",
 	}
 
 	// Act
@@ -235,11 +235,11 @@ func TestBuildPortLabel(t *testing.T) {
 		containerPort int
 		expected      string
 	}{
-		{3000, "worktree.original-port.3000"},
-		{5432, "worktree.original-port.5432"},
-		{80, "worktree.original-port.80"},
-		{443, "worktree.original-port.443"},
-		{8080, "worktree.original-port.8080"},
+		{3000, "loam.original-port.3000"},
+		{5432, "loam.original-port.5432"},
+		{80, "loam.original-port.80"},
+		{443, "loam.original-port.443"},
+		{8080, "loam.original-port.8080"},
 	}
 
 	for _, tc := range testCases {
@@ -259,9 +259,9 @@ func TestParsePortLabels(t *testing.T) {
 		LabelManagedBy: ManagedByValue,
 		LabelName:      "test",
 		// Port labels to be parsed.
-		"worktree.original-port.3000": "13000",
-		"worktree.original-port.5432": "15432",
-		"worktree.original-port.8080": "18080",
+		"loam.original-port.3000": "13000",
+		"loam.original-port.5432": "15432",
+		"loam.original-port.8080": "18080",
 	}
 
 	allocations, err := ParsePortLabels(labels)
@@ -300,7 +300,7 @@ func TestParsePortLabels_Empty(t *testing.T) {
 func TestParsePortLabels_InvalidFormat(t *testing.T) {
 	t.Run("non-numeric container port", func(t *testing.T) {
 		labels := map[string]string{
-			"worktree.original-port.abc": "13000",
+			"loam.original-port.abc": "13000",
 		}
 
 		_, err := ParsePortLabels(labels)
@@ -311,7 +311,7 @@ func TestParsePortLabels_InvalidFormat(t *testing.T) {
 
 	t.Run("non-numeric host port", func(t *testing.T) {
 		labels := map[string]string{
-			"worktree.original-port.3000": "not-a-port",
+			"loam.original-port.3000": "not-a-port",
 		}
 
 		_, err := ParsePortLabels(labels)

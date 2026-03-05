@@ -1,12 +1,12 @@
 // container.go implements Docker container lifecycle operations for the
-// worktree-container CLI. It provides functions for listing, grouping,
+// loam CLI. It provides functions for listing, grouping,
 // starting, stopping, and removing containers that are managed by this tool.
 //
 // Container management follows two patterns:
 //   - Pattern A/B (image/Dockerfile): single container managed via Docker SDK
 //   - Pattern C/D (Compose): multiple containers managed via docker compose CLI
 //
-// All managed containers are identified by the "worktree.managed-by" label,
+// All managed containers are identified by the "loam.managed-by" label,
 // which enables filtering them from unrelated containers on the same host.
 package docker
 
@@ -28,11 +28,11 @@ import (
 	// filters package provides Args type for building Docker API query filters.
 	"github.com/docker/docker/api/types/filters"
 
-	"github.com/mmr-tortoise/worktree-container/internal/model"
+	"github.com/mmr-tortoise/loam/internal/model"
 )
 
 // ListManagedContainers queries the Docker daemon for all containers that have
-// the "worktree.managed-by=worktree-container" label. It returns a slice of
+// the "loam.managed-by=loam" label. It returns a slice of
 // ContainerInfo representing each managed container, including stopped ones.
 //
 // This function is the primary entry point for discovering what worktree
@@ -41,7 +41,7 @@ import (
 //
 // The function lists ALL containers (including stopped ones) because
 // a worktree environment may have stopped containers that still need
-// to be tracked (e.g., for "wt list" or "wt destroy" commands).
+// to be tracked (e.g., for "loam list" or "loam remove" commands).
 func ListManagedContainers(ctx context.Context, cli *Client) ([]model.ContainerInfo, error) {
 	// Build a Docker API filter that matches only containers with our
 	// management label. This is more efficient than listing all containers
@@ -108,10 +108,10 @@ func containerToInfo(c types.Container) model.ContainerInfo {
 }
 
 // GroupContainersByEnv groups a slice of ContainerInfo by their
-// "worktree.name" label value. This is useful for the "wt list" command,
+// "loam.name" label value. This is useful for the "loam list" command,
 // which needs to display containers organized by worktree environment.
 //
-// Containers without a "worktree.name" label are silently skipped,
+// Containers without a "loam.name" label are silently skipped,
 // since they cannot be attributed to any environment. This should not
 // happen in practice because ListManagedContainers already filters for
 // containers with worktree labels.
@@ -164,7 +164,7 @@ func BuildWorktreeEnv(envName string, containers []model.ContainerInfo) (*model.
 	}
 
 	// Attach all containers to the environment for downstream use
-	// (e.g., displaying container details in "wt list --json").
+	// (e.g., displaying container details in "loam list --json").
 	env.Containers = containers
 
 	// Determine the overall environment status based on container states
@@ -234,7 +234,7 @@ func ComposeUp(ctx context.Context, projectDir string, composeFiles []string, en
 // specified project directory.
 //
 // This preserves container state and data, allowing them to be restarted
-// later with ComposeUp. This maps to the "wt stop" CLI command.
+// later with ComposeUp. This maps to the "loam stop" CLI command.
 func ComposeStop(ctx context.Context, projectDir string, composeFiles []string) error {
 	args := buildComposeArgs(composeFiles)
 	args = append(args, "stop")
@@ -246,7 +246,7 @@ func ComposeStop(ctx context.Context, projectDir string, composeFiles []string) 
 // created by docker compose. It executes "docker compose -f file1 -f file2 down"
 // with an optional -v flag for volume removal.
 //
-// This is used by the "wt destroy" CLI command to completely clean up
+// This is used by the "loam remove" CLI command to completely clean up
 // all Docker resources associated with a worktree environment.
 //
 // When removeVolumes is true, the -v flag is added to also remove named
@@ -401,7 +401,7 @@ func StopContainer(ctx context.Context, cli *Client, containerID string) error {
 //
 // When force is true, Docker will first kill the container (SIGKILL)
 // and then remove it. This is useful for cleanup operations where
-// graceful shutdown is not required (e.g., "wt destroy --force").
+// graceful shutdown is not required (e.g., "loam remove --force").
 //
 // This is used for Pattern A/B containers that are managed individually
 // rather than through docker compose.

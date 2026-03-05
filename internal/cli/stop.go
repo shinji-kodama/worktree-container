@@ -1,4 +1,4 @@
-// Package cli — stop.go implements the "worktree-container stop" command.
+// Package cli — stop.go implements the "loam stop" command.
 //
 // The stop command gracefully stops all containers in a named worktree
 // environment. For Compose-based patterns (C/D), it delegates to
@@ -19,9 +19,9 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/mmr-tortoise/worktree-container/internal/docker"
-	"github.com/mmr-tortoise/worktree-container/internal/model"
-	"github.com/mmr-tortoise/worktree-container/internal/worktree"
+	"github.com/mmr-tortoise/loam/internal/docker"
+	"github.com/mmr-tortoise/loam/internal/model"
+	"github.com/mmr-tortoise/loam/internal/worktree"
 )
 
 // NewStopCommand creates the "stop" cobra command.
@@ -37,8 +37,8 @@ Data and configuration are preserved, and the environment can be
 restarted later with the "start" command.
 
 Examples:
-  worktree-container stop feature-auth
-  worktree-container stop --json feature-auth`,
+  loam stop feature-auth
+  loam stop --json feature-auth`,
 
 		// Exactly one positional argument (environment name) is required.
 		Args: cobra.ExactArgs(1),
@@ -221,7 +221,7 @@ func findEnvironmentFromMarker(envName string) (*model.WorktreeEnv, error) {
 		}
 
 		// Skip markers not written by this tool.
-		if marker.ManagedBy != "worktree-container" {
+		if marker.ManagedBy != "loam" {
 			continue
 		}
 

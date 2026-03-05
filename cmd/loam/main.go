@@ -1,4 +1,4 @@
-// Package main is the entry point for the worktree-container CLI.
+// Package main is the entry point for the loam CLI.
 //
 // This binary provides commands to manage Dev Container environments
 // associated with Git worktrees. It delegates all functionality to the
@@ -10,7 +10,7 @@
 package main
 
 import (
-	"github.com/mmr-tortoise/worktree-container/internal/cli"
+	"github.com/mmr-tortoise/loam/internal/cli"
 )
 
 // version, commit, and date are set by GoReleaser at build time
