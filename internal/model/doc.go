@@ -1,5 +1,5 @@
 // Package model defines the domain types and value objects for the
-// worktree-container CLI.
+// loam CLI.
 //
 // This package contains pure data structures with no external dependencies.
 // All entities (WorktreeEnv, PortAllocation, DevContainerConfig, etc.)

@@ -10,7 +10,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/mmr-tortoise/worktree-container/internal/model"
+	"github.com/mmr-tortoise/loam/internal/model"
 )
 
 // TestFormatPortsList verifies that FormatPortsList correctly converts

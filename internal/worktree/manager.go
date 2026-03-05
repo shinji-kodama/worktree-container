@@ -2,7 +2,7 @@
 //
 // This package wraps Git CLI commands (via os/exec) to create, list,
 // remove, and inspect Git worktrees. It serves as the Git integration
-// layer for the worktree-container CLI, where each worktree is paired
+// layer for the loam CLI, where each worktree is paired
 // with an independent Dev Container environment.
 //
 // Design decisions:
@@ -23,21 +23,21 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/mmr-tortoise/worktree-container/internal/model"
+	"github.com/mmr-tortoise/loam/internal/model"
 )
 
 // MarkerFileName is the name of the marker file placed in each managed worktree.
-// This file identifies the worktree as being managed by worktree-container and
+// This file identifies the worktree as being managed by loam and
 // stores metadata needed for the dual-source (marker + Docker labels) approach.
-const MarkerFileName = ".worktree-container"
+const MarkerFileName = ".loam"
 
-// MarkerFile represents the JSON content of the .worktree-container marker file.
+// MarkerFile represents the JSON content of the .loam marker file.
 // This file is placed in the root of each managed worktree to allow
-// worktree-container to discover environments even when Docker is unavailable
+// loam to discover environments even when Docker is unavailable
 // or when no containers have been created (PatternNone).
 type MarkerFile struct {
 	// ManagedBy identifies the tool that manages this worktree.
-	// Always set to "worktree-container".
+	// Always set to "loam".
 	ManagedBy string `json:"managedBy"`
 
 	// Name is the environment name (same as WorktreeEnv.Name).
@@ -61,7 +61,7 @@ type MarkerFile struct {
 }
 
 // WriteMarkerFile writes a MarkerFile as JSON to the worktree directory.
-// The file is created at <worktreePath>/.worktree-container with 0644 permissions.
+// The file is created at <worktreePath>/.loam with 0644 permissions.
 // This function overwrites any existing marker file at the same path.
 func WriteMarkerFile(worktreePath string, marker MarkerFile) error {
 	data, err := json.MarshalIndent(marker, "", "  ")
@@ -77,9 +77,9 @@ func WriteMarkerFile(worktreePath string, marker MarkerFile) error {
 	return nil
 }
 
-// ReadMarkerFile reads and parses the .worktree-container marker file from
+// ReadMarkerFile reads and parses the .loam marker file from
 // the given worktree path. Returns nil, nil if the file does not exist
-// (indicating the worktree is not managed by worktree-container).
+// (indicating the worktree is not managed by loam).
 // Returns an error if the file exists but cannot be parsed.
 func ReadMarkerFile(worktreePath string) (*MarkerFile, error) {
 	path := filepath.Join(worktreePath, MarkerFileName)

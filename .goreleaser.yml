@@ -1,4 +1,4 @@
-# GoReleaser configuration for worktree-container
+# GoReleaser configuration for loam
 # Documentation: https://goreleaser.com
 version: 2
 
@@ -8,9 +8,9 @@ before:
     - go generate ./...
 
 builds:
-  - id: worktree-container
-    main: ./cmd/worktree-container
-    binary: worktree-container
+  - id: loam
+    main: ./cmd/loam
+    binary: loam
     env:
       - CGO_ENABLED=0
     goos:
@@ -60,10 +60,10 @@ brews:
       name: homebrew-tap
       token: "{{ .Env.HOMEBREW_TAP_TOKEN }}"
     directory: Formula
-    homepage: "https://github.com/mmr-tortoise/worktree-container"
+    homepage: "https://github.com/mmr-tortoise/loam"
     description: "Git worktree-aware Dev Container environment manager"
     license: "MIT"
     install: |
-      bin.install "worktree-container"
+      bin.install "loam"
     test: |
-      system "#{bin}/worktree-container", "--version"
+      system "#{bin}/loam", "--version"

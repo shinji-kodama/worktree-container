@@ -1,4 +1,4 @@
-// Package cli — start.go implements the "worktree-container start" command.
+// Package cli — start.go implements the "loam start" command.
 //
 // The start command restarts a previously stopped worktree environment.
 // Before starting containers, it verifies that all allocated host ports
@@ -19,10 +19,10 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/mmr-tortoise/worktree-container/internal/devcontainer"
-	"github.com/mmr-tortoise/worktree-container/internal/docker"
-	"github.com/mmr-tortoise/worktree-container/internal/model"
-	"github.com/mmr-tortoise/worktree-container/internal/port"
+	"github.com/mmr-tortoise/loam/internal/devcontainer"
+	"github.com/mmr-tortoise/loam/internal/docker"
+	"github.com/mmr-tortoise/loam/internal/model"
+	"github.com/mmr-tortoise/loam/internal/port"
 )
 
 // NewStartCommand creates the "start" cobra command.
@@ -38,8 +38,8 @@ are still available. If any port conflict is detected, the command
 exits with code 4 and reports which ports are in use.
 
 Examples:
-  worktree-container start feature-auth
-  worktree-container start --json feature-auth`,
+  loam start feature-auth
+  loam start --json feature-auth`,
 
 		// Exactly one positional argument (environment name) is required.
 		Args: cobra.ExactArgs(1),
@@ -100,8 +100,8 @@ func runStart(ctx context.Context, envName string) error {
 		// Guide the user to re-create the environment.
 		fmt.Printf("Environment %q has a devcontainer.json but was created without container support.\n", envName)
 		fmt.Println("To set up containers, re-create the environment:")
-		fmt.Printf("  worktree-container remove --force --keep-worktree %s\n", envName)
-		fmt.Printf("  worktree-container create %s\n", env.Branch)
+		fmt.Printf("  loam remove --force --keep-worktree %s\n", envName)
+		fmt.Printf("  loam create %s\n", env.Branch)
 		return nil
 	}
 

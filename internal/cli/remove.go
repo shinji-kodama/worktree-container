@@ -1,4 +1,4 @@
-// Package cli — remove.go implements the "worktree-container remove" command.
+// Package cli — remove.go implements the "loam remove" command.
 //
 // The remove command completely destroys a worktree environment by:
 //  1. Stopping and removing all Docker containers and resources
@@ -24,9 +24,9 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/mmr-tortoise/worktree-container/internal/docker"
-	"github.com/mmr-tortoise/worktree-container/internal/model"
-	"github.com/mmr-tortoise/worktree-container/internal/worktree"
+	"github.com/mmr-tortoise/loam/internal/docker"
+	"github.com/mmr-tortoise/loam/internal/model"
+	"github.com/mmr-tortoise/loam/internal/worktree"
 )
 
 // removeFlags holds the flag values for the remove command.
@@ -55,9 +55,9 @@ to preserve the directory while removing only the Docker resources.
 Unless --force is specified, the command prompts for confirmation.
 
 Examples:
-  worktree-container remove feature-auth
-  worktree-container remove --force feature-auth
-  worktree-container remove --keep-worktree feature-auth`,
+  loam remove feature-auth
+  loam remove --force feature-auth
+  loam remove --keep-worktree feature-auth`,
 
 		// Exactly one positional argument (environment name) is required.
 		Args: cobra.ExactArgs(1),

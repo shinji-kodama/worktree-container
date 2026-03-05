@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/mmr-tortoise/worktree-container/internal/model"
+	"github.com/mmr-tortoise/loam/internal/model"
 )
 
 // setupTestRepo creates a temporary directory with an initialized Git repository
@@ -68,7 +68,7 @@ func TestWriteAndReadMarkerFile(t *testing.T) {
 	dir := t.TempDir()
 
 	original := MarkerFile{
-		ManagedBy:      "worktree-container",
+		ManagedBy:      "loam",
 		Name:           "feature-auth",
 		Branch:         "feature/auth",
 		SourceRepoPath: "/path/to/repo",

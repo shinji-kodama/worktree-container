@@ -1,5 +1,5 @@
 // Package worktree provides Git worktree management operations for
-// the worktree-container CLI.
+// the loam CLI.
 //
 // All Git operations are performed via os/exec calls to the git binary,
 // rather than using a Git library like go-git. This approach:

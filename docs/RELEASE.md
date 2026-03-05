@@ -1,32 +1,32 @@
-# リリース手順チェックリスト
+# Release Procedure Checklist
 
-本ドキュメントは `worktree-container` のリリースプロセスを定義する。
+This document defines the release process for `loam`.
 
-## 前提条件
+## Prerequisites
 
-- [ ] Go >= 1.25 がインストールされている
-- [ ] GoReleaser がインストールされている（`brew install goreleaser`）
-- [ ] golangci-lint がインストールされている（`brew install golangci-lint`）
-- [ ] GitHub CLI（`gh`）がインストールされ、認証済みである
-- [ ] Docker Desktop が稼働中である
-- [ ] `main` ブランチが最新の状態である
+- [ ] Go >= 1.25 is installed
+- [ ] GoReleaser is installed (`brew install goreleaser`)
+- [ ] golangci-lint is installed (`brew install golangci-lint`)
+- [ ] GitHub CLI (`gh`) is installed and authenticated
+- [ ] Docker Desktop is running
+- [ ] The `main` branch is up to date
 
 ---
 
-## 初回リリース固有の手順
+## First Release Only Steps
 
-初回リリース（v0.1.0）でのみ必要な手順。2回目以降のリリースではスキップ可能。
+These steps are only required for the initial release (v0.1.0). They can be skipped for subsequent releases.
 
-### Homebrew Tap リポジトリの作成
+### Creating the Homebrew Tap Repository
 
-- [ ] `mmr-tortoise/homebrew-tap` リポジトリを作成
+- [ ] Create the `mmr-tortoise/homebrew-tap` repository
 
   ```bash
   gh repo create mmr-tortoise/homebrew-tap --public \
     --description "Homebrew tap for mmr-tortoise packages"
   ```
 
-- [ ] `Formula/` ディレクトリと README.md を作成してコミット・push
+- [ ] Create the `Formula/` directory and README.md, then commit and push
 
   ```bash
   gh repo clone mmr-tortoise/homebrew-tap
@@ -34,180 +34,180 @@
   mkdir Formula
   echo "# Homebrew Tap" > README.md
   git add .
-  git commit -m "chore: 初期化"
+  git commit -m "chore: initialize"
   git push
   ```
 
-### GitHub Personal Access Token（PAT）の作成
+### Creating a GitHub Personal Access Token (PAT)
 
-- [ ] GitHub Settings > Developer settings > Personal access tokens > Fine-grained tokens で新しい PAT を作成
-  - トークン名: `HOMEBREW_TAP_TOKEN`
-  - リポジトリアクセス: `mmr-tortoise/homebrew-tap` のみ
-  - 権限: Contents（Read and write）
+- [ ] Create a new PAT under GitHub Settings > Developer settings > Personal access tokens > Fine-grained tokens
+  - Token name: `HOMEBREW_TAP_TOKEN`
+  - Repository access: `mmr-tortoise/homebrew-tap` only
+  - Permissions: Contents (Read and write)
 
-### GitHub Secrets の設定
+### Configuring GitHub Secrets
 
-- [ ] `worktree-container` リポジトリの Secrets に `HOMEBREW_TAP_TOKEN` を設定
+- [ ] Set `HOMEBREW_TAP_TOKEN` in the `loam` repository Secrets
 
   ```bash
-  gh secret set HOMEBREW_TAP_TOKEN --repo mmr-tortoise/worktree-container
+  gh secret set HOMEBREW_TAP_TOKEN --repo mmr-tortoise/loam
   ```
 
 ---
 
-## 通常リリース手順
+## Standard Release Procedure
 
-すべてのリリースで実行する手順。
+Steps to follow for every release.
 
-### 1. リリース前の確認
+### 1. Pre-release Checks
 
-- [ ] `main` ブランチで作業していることを確認
+- [ ] Confirm you are working on the `main` branch
 
   ```bash
   git checkout main
   git pull origin main
   ```
 
-- [ ] ユニットテストが全通過することを確認
+- [ ] Confirm all unit tests pass
 
   ```bash
   go test ./internal/... -race -count=1
   ```
 
-- [ ] lint エラーがないことを確認
+- [ ] Confirm there are no lint errors
 
   ```bash
   golangci-lint run
   ```
 
-- [ ] ビルドが成功することを確認
+- [ ] Confirm the build succeeds
 
   ```bash
-  go build ./cmd/worktree-container/
+  go build ./cmd/loam/
   ```
 
-### 2. GoReleaser スナップショットビルドの検証
+### 2. Verify GoReleaser Snapshot Build
 
-- [ ] スナップショットビルドを実行
+- [ ] Run a snapshot build
 
   ```bash
   goreleaser release --snapshot --clean
   ```
 
-- [ ] `dist/` ディレクトリに以下のアーティファクトが存在することを確認
-  - `worktree-container_*_darwin_amd64.tar.gz`
-  - `worktree-container_*_darwin_arm64.tar.gz`
-  - `worktree-container_*_linux_amd64.tar.gz`
-  - `worktree-container_*_linux_arm64.tar.gz`
-  - `worktree-container_*_windows_amd64.zip`
-  - `worktree-container_*_windows_arm64.zip`
+- [ ] Confirm the following artifacts exist in the `dist/` directory
+  - `loam_*_darwin_amd64.tar.gz`
+  - `loam_*_darwin_arm64.tar.gz`
+  - `loam_*_linux_amd64.tar.gz`
+  - `loam_*_linux_arm64.tar.gz`
+  - `loam_*_windows_amd64.zip`
+  - `loam_*_windows_arm64.zip`
   - `checksums.txt`
 
-- [ ] ローカルプラットフォーム用バイナリで `--version` を確認
+- [ ] Verify `--version` with the binary for your local platform
 
   ```bash
-  ./dist/worktree-container_*/worktree-container --version
+  ./dist/loam_*/loam --version
   ```
 
-### 3. バージョンタグの作成と push
+### 3. Create and Push the Version Tag
 
-- [ ] バージョンタグを作成して push
+- [ ] Create and push the version tag
 
   ```bash
   git tag v<VERSION>
   git push origin v<VERSION>
   ```
 
-### 4. GitHub Actions リリースワークフローの確認
+### 4. Verify the GitHub Actions Release Workflow
 
-- [ ] Release ワークフローが自動実行されることを確認
+- [ ] Confirm the Release workflow runs automatically
 
   ```bash
   gh run watch
   ```
 
-- [ ] GitHub Release ページにアーティファクトが正しくアップロードされていることを確認
+- [ ] Confirm artifacts are correctly uploaded to the GitHub Release page
 
   ```bash
   gh release view v<VERSION>
   ```
 
-### 5. Homebrew Formula の確認
+### 5. Verify the Homebrew Formula
 
-- [ ] `mmr-tortoise/homebrew-tap` リポジトリに Formula が push されていることを確認
+- [ ] Confirm the Formula has been pushed to the `mmr-tortoise/homebrew-tap` repository
 
   ```bash
-  gh api repos/mmr-tortoise/homebrew-tap/contents/Formula/worktree-container.rb
+  gh api repos/mmr-tortoise/homebrew-tap/contents/Formula/loam.rb
   ```
 
-- [ ] Homebrew でインストールできることを確認（オプション）
+- [ ] Confirm it can be installed via Homebrew (optional)
 
   ```bash
-  brew install mmr-tortoise/tap/worktree-container
-  worktree-container --version
+  brew install mmr-tortoise/tap/loam
+  loam --version
   ```
 
 ---
 
-## WinGet マニフェスト提出手順
+## WinGet Manifest Submission Procedure
 
-リリース後に手動で実施する。
+This is done manually after a release.
 
-### 1. SHA256 ハッシュの取得
+### 1. Obtain the SHA256 Hash
 
-- [ ] GitHub Release の `checksums.txt` から Windows 用バイナリの SHA256 を取得
+- [ ] Get the SHA256 hash for the Windows binaries from `checksums.txt` in the GitHub Release
 
   ```bash
   gh release download v<VERSION> --pattern checksums.txt
   grep windows checksums.txt
   ```
 
-### 2. マニフェストテンプレートの更新
+### 2. Update the Manifest Templates
 
-- [ ] テンプレートのプレースホルダーを実際の値に置換
+- [ ] Replace the placeholders in the templates with actual values
 
   ```bash
   cd packaging/winget/
-  # VERSION, SHA256_X64, SHA256_ARM64, RELEASE_DATE を置換
+  # Replace VERSION, SHA256_X64, SHA256_ARM64, RELEASE_DATE
   sed -i '' 's/{{VERSION}}/<VERSION>/g' *.yaml
   sed -i '' 's/{{SHA256_X64}}/<SHA256_X64>/g' *.yaml
   sed -i '' 's/{{SHA256_ARM64}}/<SHA256_ARM64>/g' *.yaml
   sed -i '' 's/{{RELEASE_DATE}}/<RELEASE_DATE>/g' *.yaml
   ```
 
-### 3. PR の提出
+### 3. Submit the PR
 
-- [ ] `microsoft/winget-pkgs` リポジトリをフォーク
-- [ ] フォークしたリポジトリにマニフェストファイルをコピー
+- [ ] Fork the `microsoft/winget-pkgs` repository
+- [ ] Copy the manifest files to your forked repository
 
   ```bash
-  # manifests/s/mmr-tortoise/worktree-container/<VERSION>/ に配置
-  mkdir -p manifests/s/mmr-tortoise/worktree-container/<VERSION>/
-  cp packaging/winget/*.yaml manifests/s/mmr-tortoise/worktree-container/<VERSION>/
+  # Place them under manifests/s/mmr-tortoise/loam/<VERSION>/
+  mkdir -p manifests/s/mmr-tortoise/loam/<VERSION>/
+  cp packaging/winget/*.yaml manifests/s/mmr-tortoise/loam/<VERSION>/
   ```
 
-- [ ] PR を提出して WinGet チームのレビューを待つ
+- [ ] Submit a PR and wait for the WinGet team's review
 
 ---
 
-## トラブルシューティング
+## Troubleshooting
 
-### GoReleaser が失敗する場合
+### GoReleaser Fails
 
 ```bash
-# 設定の検証
+# Validate the configuration
 goreleaser check
 
-# 詳細ログでスナップショット実行
+# Run a snapshot build with verbose logging
 goreleaser release --snapshot --clean --verbose
 ```
 
-### Homebrew Formula が push されない場合
+### Homebrew Formula Is Not Pushed
 
-- `HOMEBREW_TAP_TOKEN` の権限を確認
-- PAT の有効期限を確認
-- `mmr-tortoise/homebrew-tap` リポジトリの存在を確認
+- Check the permissions of `HOMEBREW_TAP_TOKEN`
+- Check the expiration date of the PAT
+- Confirm the `mmr-tortoise/homebrew-tap` repository exists
 
-### CI が Go バージョンエラーで失敗する場合
+### CI Fails with a Go Version Error
 
-- `go.mod` の `go` ディレクティブと `.github/workflows/ci.yml` の `go-version` が一致していることを確認
+- Confirm that the `go` directive in `go.mod` matches the `go-version` in `.github/workflows/ci.yml`

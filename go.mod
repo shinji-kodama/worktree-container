@@ -1,4 +1,4 @@
-module github.com/mmr-tortoise/worktree-container
+module github.com/mmr-tortoise/loam
 
 go 1.25.0
 

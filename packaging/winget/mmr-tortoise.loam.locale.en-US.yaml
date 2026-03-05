@@ -1,27 +1,27 @@
 # yaml-language-server: $schema=https://aka.ms/winget-manifest.defaultLocale.1.9.0.schema.json
 # ─────────────────────────────────────────────────────────────────────
-# WinGet Default Locale Manifest for worktree-container
+# WinGet Default Locale Manifest for loam
 #
 # Directory in winget-pkgs:
-#   manifests/s/mmr-tortoise/worktree-container/{{VERSION}}/
+#   manifests/s/mmr-tortoise/loam/{{VERSION}}/
 #
-# File name: mmr-tortoise.worktree-container.locale.en-US.yaml
+# File name: mmr-tortoise.loam.locale.en-US.yaml
 # ─────────────────────────────────────────────────────────────────────
-PackageIdentifier: mmr-tortoise.worktree-container
+PackageIdentifier: mmr-tortoise.loam
 PackageVersion: "{{VERSION}}"
 PackageLocale: en-US
 Publisher: mmr-tortoise
 PublisherUrl: https://github.com/mmr-tortoise
-PackageName: worktree-container
-PackageUrl: https://github.com/mmr-tortoise/worktree-container
+PackageName: loam
+PackageUrl: https://github.com/mmr-tortoise/loam
 License: MIT
-LicenseUrl: https://github.com/mmr-tortoise/worktree-container/blob/main/LICENSE
+LicenseUrl: https://github.com/mmr-tortoise/loam/blob/main/LICENSE
 ShortDescription: Git worktree-aware Dev Container environment manager
 Description: |-
   CLI tool that automatically builds independent Dev Container environments
   for each Git worktree. Manages port shifting to prevent port conflicts
   between multiple worktree environments running simultaneously.
-Moniker: worktree-container
+Moniker: loam
 Tags:
   - cli
   - containers
@@ -31,6 +31,6 @@ Tags:
   - git
   - git-worktree
   - worktree
-ReleaseNotesUrl: https://github.com/mmr-tortoise/worktree-container/releases/tag/v{{VERSION}}
+ReleaseNotesUrl: https://github.com/mmr-tortoise/loam/releases/tag/v{{VERSION}}
 ManifestType: defaultLocale
 ManifestVersion: 1.9.0

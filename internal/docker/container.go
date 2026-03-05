@@ -1,12 +1,12 @@
 // container.go implements Docker container lifecycle operations for the
-// worktree-container CLI. It provides functions for listing, grouping,
+// loam CLI. It provides functions for listing, grouping,
 // starting, stopping, and removing containers that are managed by this tool.
 //
 // Container management follows two patterns:
 //   - Pattern A/B (image/Dockerfile): single container managed via Docker SDK
 //   - Pattern C/D (Compose): multiple containers managed via docker compose CLI
 //
-// All managed containers are identified by the "worktree.managed-by" label,
+// All managed containers are identified by the "loam.managed-by" label,
 // which enables filtering them from unrelated containers on the same host.
 package docker
 
@@ -28,11 +28,11 @@ import (
 	// filters package provides Args type for building Docker API query filters.
 	"github.com/docker/docker/api/types/filters"
 
-	"github.com/mmr-tortoise/worktree-container/internal/model"
+	"github.com/mmr-tortoise/loam/internal/model"
 )
 
 // ListManagedContainers queries the Docker daemon for all containers that have
-// the "worktree.managed-by=worktree-container" label. It returns a slice of
+// the "loam.managed-by=loam" label. It returns a slice of
 // ContainerInfo representing each managed container, including stopped ones.
 //
 // This function is the primary entry point for discovering what worktree
@@ -108,10 +108,10 @@ func containerToInfo(c types.Container) model.ContainerInfo {
 }
 
 // GroupContainersByEnv groups a slice of ContainerInfo by their
-// "worktree.name" label value. This is useful for the "wt list" command,
+// "loam.name" label value. This is useful for the "wt list" command,
 // which needs to display containers organized by worktree environment.
 //
-// Containers without a "worktree.name" label are silently skipped,
+// Containers without a "loam.name" label are silently skipped,
 // since they cannot be attributed to any environment. This should not
 // happen in practice because ListManagedContainers already filters for
 // containers with worktree labels.

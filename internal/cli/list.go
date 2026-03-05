@@ -1,7 +1,7 @@
-// Package cli — list.go implements the "worktree-container list" command.
+// Package cli — list.go implements the "loam list" command.
 //
 // The list command displays all managed worktree environments using a
-// dual-source approach: marker files (.worktree-container) for local
+// dual-source approach: marker files (.loam) for local
 // worktree discovery, and Docker container labels for live container state.
 // This allows listing environments even when Docker is unavailable.
 //
@@ -22,9 +22,9 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/mmr-tortoise/worktree-container/internal/docker"
-	"github.com/mmr-tortoise/worktree-container/internal/model"
-	"github.com/mmr-tortoise/worktree-container/internal/worktree"
+	"github.com/mmr-tortoise/loam/internal/docker"
+	"github.com/mmr-tortoise/loam/internal/model"
+	"github.com/mmr-tortoise/loam/internal/worktree"
 )
 
 // listFlags holds the flag values for the list command.
@@ -49,9 +49,9 @@ Each environment is shown with its name, branch, lifecycle status,
 service count, and allocated host ports.
 
 Examples:
-  worktree-container list
-  worktree-container list --status running
-  worktree-container list --json`,
+  loam list
+  loam list --status running
+  loam list --json`,
 
 		// No positional arguments are required for the list command.
 		Args: cobra.NoArgs,
@@ -110,12 +110,12 @@ func runList(ctx context.Context, flags *listFlags) error {
 				continue
 			}
 			if marker == nil {
-				continue // No marker file — not managed by worktree-container.
+				continue // No marker file — not managed by loam.
 			}
 
-			// Validate that this marker was written by worktree-container.
+			// Validate that this marker was written by loam.
 			// Markers from other tools or with corrupted data are silently skipped.
-			if marker.ManagedBy != "worktree-container" {
+			if marker.ManagedBy != "loam" {
 				VerboseLog("Warning: ignoring marker at %s with unexpected managedBy %q", wtPath, marker.ManagedBy)
 				continue
 			}

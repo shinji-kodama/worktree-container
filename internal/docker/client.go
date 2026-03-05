@@ -2,7 +2,7 @@
 // for managing containers associated with Git worktree environments.
 //
 // The primary purpose of this package is to abstract Docker API interactions
-// and provide worktree-container-specific functionality such as label-based
+// and provide loam-specific functionality such as label-based
 // container filtering and automatic Docker socket detection.
 package docker
 
@@ -16,7 +16,7 @@ import (
 
 	"github.com/docker/docker/client"
 
-	"github.com/mmr-tortoise/worktree-container/internal/model"
+	"github.com/mmr-tortoise/loam/internal/model"
 )
 
 // defaultPingTimeout is the maximum duration to wait for a Docker daemon
@@ -25,7 +25,7 @@ import (
 // than native Linux Docker.
 const defaultPingTimeout = 5 * time.Second
 
-// Client wraps the Docker Engine SDK client to provide worktree-container
+// Client wraps the Docker Engine SDK client to provide loam
 // specific functionality. It handles automatic Docker socket detection
 // across platforms (Linux, macOS, Windows) and provides methods for
 // verifying Docker daemon connectivity.

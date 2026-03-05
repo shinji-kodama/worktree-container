@@ -1,5 +1,5 @@
 // Package docker provides Docker Engine API wrappers and container
-// lifecycle management for the worktree-container CLI.
+// lifecycle management for the loam CLI.
 //
 // This package handles:
 //   - Docker client initialization with automatic socket detection

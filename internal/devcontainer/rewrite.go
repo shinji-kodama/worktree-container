@@ -22,7 +22,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/mmr-tortoise/worktree-container/internal/model"
+	"github.com/mmr-tortoise/loam/internal/model"
 	"github.com/tidwall/jsonc"
 )
 
@@ -104,9 +104,9 @@ func RewriteConfig(rawJSON []byte, envName string, worktreeIndex int, portAlloca
 // applyRunArgsLabels appends Docker --label flags to the runArgs array.
 // Each label is added as two separate entries: "--label" and "key=value".
 //
-// Example: for label {"worktree.name": "my-env"}, this appends:
+// Example: for label {"loam.name": "my-env"}, this appends:
 //
-//	"--label", "worktree.name=my-env"
+//	"--label", "loam.name=my-env"
 //
 // If runArgs doesn't exist yet in the config, it is created as a new array.
 func applyRunArgsLabels(configMap map[string]interface{}, labels map[string]string) {

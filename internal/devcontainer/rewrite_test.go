@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/mmr-tortoise/worktree-container/internal/model"
+	"github.com/mmr-tortoise/loam/internal/model"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -46,8 +46,8 @@ func TestRewriteConfig_PatternA(t *testing.T) {
 	}
 
 	labels := map[string]string{
-		"worktree.managed-by": "worktree-container",
-		"worktree.name":       "feature-auth",
+		"loam.managed-by": "loam",
+		"loam.name":       "feature-auth",
 	}
 
 	// Act
@@ -78,9 +78,9 @@ func TestRewriteConfig_PatternA(t *testing.T) {
 	}
 	assert.Contains(t, runArgsStrs, "--label",
 		"runArgs should contain --label flag")
-	assert.Contains(t, runArgsStrs, "worktree.managed-by=worktree-container",
+	assert.Contains(t, runArgsStrs, "loam.managed-by=loam",
 		"runArgs should contain the managed-by label")
-	assert.Contains(t, runArgsStrs, "worktree.name=feature-auth",
+	assert.Contains(t, runArgsStrs, "loam.name=feature-auth",
 		"runArgs should contain the name label")
 
 	// Assert 3: appPort is rewritten with shifted ports.
@@ -148,8 +148,8 @@ func TestRewriteConfig_PatternB(t *testing.T) {
 	}
 
 	labels := map[string]string{
-		"worktree.managed-by": "worktree-container",
-		"worktree.name":       "feature-db",
+		"loam.managed-by": "loam",
+		"loam.name":       "feature-db",
 	}
 
 	// Act
@@ -212,7 +212,7 @@ func TestRewriteConfig_EmptyPorts(t *testing.T) {
 	var portAllocations []model.PortAllocation
 
 	labels := map[string]string{
-		"worktree.managed-by": "worktree-container",
+		"loam.managed-by": "loam",
 	}
 
 	// Act
@@ -247,7 +247,7 @@ func TestRewriteConfig_NoExistingRunArgs(t *testing.T) {
 	}`)
 
 	labels := map[string]string{
-		"worktree.name": "minimal-env",
+		"loam.name": "minimal-env",
 	}
 
 	result, err := RewriteConfig(rawJSON, "minimal-env", 0, nil, labels)
@@ -262,7 +262,7 @@ func TestRewriteConfig_NoExistingRunArgs(t *testing.T) {
 	require.True(t, ok, "runArgs should be created even when not originally present")
 	assert.Len(t, runArgs, 2, "runArgs should have --label and key=value pair")
 	assert.Equal(t, "--label", runArgs[0])
-	assert.Equal(t, "worktree.name=minimal-env", runArgs[1])
+	assert.Equal(t, "loam.name=minimal-env", runArgs[1])
 }
 
 // TestRewriteConfig_NoExistingContainerEnv verifies that containerEnv is

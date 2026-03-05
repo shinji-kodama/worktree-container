@@ -6,7 +6,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/mmr-tortoise/worktree-container/internal/model"
+	"github.com/mmr-tortoise/loam/internal/model"
 )
 
 // makeTestContainer is a helper that creates a model.ContainerInfo with
@@ -42,7 +42,7 @@ func makeTestContainer(id, name, service, status, envName, worktreePath string) 
 
 // TestGroupContainersByEnv verifies that GroupContainersByEnv correctly
 // groups 3 containers into 2 separate environments based on their
-// "worktree.name" label values.
+// "loam.name" label values.
 //
 // This test uses containers from two environments ("env-alpha" and "env-beta")
 // to verify that the grouping logic correctly separates them.
@@ -112,14 +112,14 @@ func TestBuildWorktreeEnv_Running(t *testing.T) {
 			ServiceName:   "app",
 			Status:        "running",
 			Labels: map[string]string{
-				LabelManagedBy:                ManagedByValue,
-				LabelName:                     "test-env",
-				LabelBranch:                   "feature/test",
-				LabelWorktreePath:             "/tmp",
-				LabelSourceRepo:               "/tmp",
-				LabelConfigPattern:            "image",
-				LabelCreatedAt:                "2026-02-28T10:00:00Z",
-				"worktree.original-port.3000": "13000",
+				LabelManagedBy:            ManagedByValue,
+				LabelName:                 "test-env",
+				LabelBranch:               "feature/test",
+				LabelWorktreePath:         "/tmp",
+				LabelSourceRepo:           "/tmp",
+				LabelConfigPattern:        "image",
+				LabelCreatedAt:            "2026-02-28T10:00:00Z",
+				"loam.original-port.3000": "13000",
 			},
 		},
 		{
@@ -128,14 +128,14 @@ func TestBuildWorktreeEnv_Running(t *testing.T) {
 			ServiceName:   "db",
 			Status:        "exited",
 			Labels: map[string]string{
-				LabelManagedBy:                ManagedByValue,
-				LabelName:                     "test-env",
-				LabelBranch:                   "feature/test",
-				LabelWorktreePath:             "/tmp",
-				LabelSourceRepo:               "/tmp",
-				LabelConfigPattern:            "image",
-				LabelCreatedAt:                "2026-02-28T10:00:00Z",
-				"worktree.original-port.5432": "15432",
+				LabelManagedBy:            ManagedByValue,
+				LabelName:                 "test-env",
+				LabelBranch:               "feature/test",
+				LabelWorktreePath:         "/tmp",
+				LabelSourceRepo:           "/tmp",
+				LabelConfigPattern:        "image",
+				LabelCreatedAt:            "2026-02-28T10:00:00Z",
+				"loam.original-port.5432": "15432",
 			},
 		},
 	}
@@ -215,7 +215,7 @@ func TestBuildWorktreeEnv_Stopped(t *testing.T) {
 func TestBuildWorktreeEnv_Orphaned(t *testing.T) {
 	// Arrange: use a non-existent path as the worktree path.
 	// This simulates a worktree that was deleted from disk.
-	nonExistentPath := "/tmp/worktree-container-test-nonexistent-path-12345"
+	nonExistentPath := "/tmp/loam-test-nonexistent-path-12345"
 
 	containers := []model.ContainerInfo{
 		{
@@ -263,7 +263,7 @@ func TestBuildWorktreeEnv_NoContainers(t *testing.T) {
 }
 
 // TestGroupContainersByEnv_SkipsNoLabel verifies that containers
-// without the "worktree.name" label are silently excluded from grouping.
+// without the "loam.name" label are silently excluded from grouping.
 // This is a defensive behavior — in practice all managed containers
 // should have this label.
 func TestGroupContainersByEnv_SkipsNoLabel(t *testing.T) {
@@ -323,7 +323,7 @@ func TestDetermineStatus_Orphaned(t *testing.T) {
 	}
 
 	// Use a path that definitely does not exist.
-	status := determineStatus(containers, "/tmp/worktree-container-nonexistent-path-99999")
+	status := determineStatus(containers, "/tmp/loam-nonexistent-path-99999")
 	assert.Equal(t, model.StatusOrphaned, status,
 		"should be orphaned when worktree path does not exist, even if containers are running")
 }

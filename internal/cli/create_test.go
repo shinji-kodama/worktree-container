@@ -12,8 +12,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/mmr-tortoise/worktree-container/internal/model"
-	"github.com/mmr-tortoise/worktree-container/internal/worktree"
+	"github.com/mmr-tortoise/loam/internal/model"
+	"github.com/mmr-tortoise/loam/internal/worktree"
 )
 
 // setupTestRepo creates a temporary directory with an initialized Git repository
@@ -73,7 +73,7 @@ func TestCreateNoDevcontainer_WorktreeAndMarker(t *testing.T) {
 
 	// Write marker file (as create.go Step 4.5 does).
 	marker := worktree.MarkerFile{
-		ManagedBy:      "worktree-container",
+		ManagedBy:      "loam",
 		Name:           envName,
 		Branch:         branchName,
 		SourceRepoPath: repoPath,
@@ -88,7 +88,7 @@ func TestCreateNoDevcontainer_WorktreeAndMarker(t *testing.T) {
 	require.NoError(t, err)
 	require.NotNil(t, readMarker)
 
-	assert.Equal(t, "worktree-container", readMarker.ManagedBy)
+	assert.Equal(t, "loam", readMarker.ManagedBy)
 	assert.Equal(t, envName, readMarker.Name)
 	assert.Equal(t, branchName, readMarker.Branch)
 	assert.Equal(t, repoPath, readMarker.SourceRepoPath)
@@ -124,7 +124,7 @@ func TestCreateWithDevcontainer_MarkerFile(t *testing.T) {
 
 	// Write initial marker (as create.go Step 4.5 does).
 	marker := worktree.MarkerFile{
-		ManagedBy:      "worktree-container",
+		ManagedBy:      "loam",
 		Name:           envName,
 		Branch:         branchName,
 		SourceRepoPath: repoPath,
@@ -167,7 +167,7 @@ func TestLateDevcontainerAddition(t *testing.T) {
 
 	// Write initial marker with PatternNone.
 	marker := worktree.MarkerFile{
-		ManagedBy:      "worktree-container",
+		ManagedBy:      "loam",
 		Name:           envName,
 		Branch:         branchName,
 		SourceRepoPath: repoPath,
@@ -224,7 +224,7 @@ func TestFindEnvironmentFromMarker_Found(t *testing.T) {
 	require.NoError(t, err)
 
 	marker := worktree.MarkerFile{
-		ManagedBy:      "worktree-container",
+		ManagedBy:      "loam",
 		Name:           envName,
 		Branch:         branchName,
 		SourceRepoPath: repoPath,
@@ -288,7 +288,7 @@ func TestFindEnvironmentFromMarker_StatusByPattern(t *testing.T) {
 
 	// Write markers.
 	err = worktree.WriteMarkerFile(wtNone, worktree.MarkerFile{
-		ManagedBy:      "worktree-container",
+		ManagedBy:      "loam",
 		Name:           "status-none",
 		Branch:         "status-none",
 		SourceRepoPath: repoPath,
@@ -298,7 +298,7 @@ func TestFindEnvironmentFromMarker_StatusByPattern(t *testing.T) {
 	require.NoError(t, err)
 
 	err = worktree.WriteMarkerFile(wtImage, worktree.MarkerFile{
-		ManagedBy:      "worktree-container",
+		ManagedBy:      "loam",
 		Name:           "status-image",
 		Branch:         "status-image",
 		SourceRepoPath: repoPath,

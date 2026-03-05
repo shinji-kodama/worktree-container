@@ -1,5 +1,5 @@
 // Package devcontainer handles parsing, rewriting, and validation of
-// devcontainer.json configuration files for the worktree-container CLI.
+// devcontainer.json configuration files for the loam CLI.
 //
 // This package supports all four devcontainer.json configuration patterns:
 //
